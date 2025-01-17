@@ -12,7 +12,7 @@ from Crypto.Cipher import DES
 from Crypto.Util.Padding import unpad
 from curl_cffi import requests
 
-from log import log_info, log_error
+from log import log_info
 
 # 适应版本
 # js_security_v3_0.1.5

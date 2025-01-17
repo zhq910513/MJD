@@ -43,7 +43,8 @@ class MJDOrder(MJDBase):
         self.session.headers.update(headers)
 
         params = "ticket=t03lrRZlXMVbb_95PW_tvAzEh9__sb3RRgNBqYalXWqDZQiwL5MR52_xvoSdeR7jv8D6lZP3VLP0DD0SMNUSgnAF6QT-R96ccBCkKtiEn1160U89Tyz3m0vPF10eNFuVYx3EEdNdDjZYa9QKCGGE_7a12Vie2uPzdqoPn2JAkFpoXzbRsc4nTZIXbXFwJmsR1rlhk49aY1a_Xj5td2M27BNktzTVZkEoVLrMRJSKXOgTLeCMCe0h6C3GUeX5B5aipVJ_BB7-aQCtaK9PH5-erxR-gPYC9gBevCZG21BhJDw7MFhtQ5LmnY4dQ**&randstr=@we4&prepayid=wx151147311743109a352c1ee801b0c40000&package=2680933601"
-        response = self.get_response('https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkcaptcha?ticket=t03lrRZlXMVbb_95PW_tvAzEh9__sb3RRgNBqYalXWqDZQiwL5MR52_xvoSdeR7jv8D6lZP3VLP0DD0SMNUSgnAF6QT-R96ccBCkKtiEn1160U89Tyz3m0vPF10eNFuVYx3EEdNdDjZYa9QKCGGE_7a12Vie2uPzdqoPn2JAkFpoXzbRsc4nTZIXbXFwJmsR1rlhk49aY1a_Xj5td2M27BNktzTVZkEoVLrMRJSKXOgTLeCMCe0h6C3GUeX5B5aipVJ_BB7-aQCtaK9PH5-erxR-gPYC9gBevCZG21BhJDw7MFhtQ5LmnY4dQ**&randstr=@we4&prepayid=wx151147311743109a352c1ee801b0c40000&package=2680933601')
+        response = self.get_response(
+            'https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkcaptcha?ticket=t03lrRZlXMVbb_95PW_tvAzEh9__sb3RRgNBqYalXWqDZQiwL5MR52_xvoSdeR7jv8D6lZP3VLP0DD0SMNUSgnAF6QT-R96ccBCkKtiEn1160U89Tyz3m0vPF10eNFuVYx3EEdNdDjZYa9QKCGGE_7a12Vie2uPzdqoPn2JAkFpoXzbRsc4nTZIXbXFwJmsR1rlhk49aY1a_Xj5td2M27BNktzTVZkEoVLrMRJSKXOgTLeCMCe0h6C3GUeX5B5aipVJ_BB7-aQCtaK9PH5-erxR-gPYC9gBevCZG21BhJDw7MFhtQ5LmnY4dQ**&randstr=@we4&prepayid=wx151147311743109a352c1ee801b0c40000&package=2680933601')
 
     # 查询
     def get_order_detail(self, order_info):
@@ -117,7 +118,8 @@ class MJDOrder(MJDBase):
 
         card_infos = resp_json["result"].get("cardInfos")
         if not card_infos:
-            log_error(f"订单 {order_info['orderId']} 获取账号密码失败, 返回数据：{resp_json}, 订单查询链接：https://recharge.m.jd.com/orderDetail?orderId={order_info['orderId']}&serviceType=3&source=41")
+            log_error(
+                f"订单 {order_info['orderId']} 获取账号密码失败, 返回数据：{resp_json}, 订单查询链接：https://recharge.m.jd.com/orderDetail?orderId={order_info['orderId']}&serviceType=3&source=41")
             raise ValueError
 
         card_dict = self.decrypt_des(encrypted_data=card_infos, key=self.qq_game_des_key)
