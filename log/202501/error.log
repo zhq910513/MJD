@@ -1,0 +1,1 @@
+[ERROR] 2025-01-17 14:14:50 [get_order_detail] 查询订单详情失败 订单ID：307843863375 返回数据：{'code': '999999', 'errorCode': '0002', 'errorMessage': '活动太火爆，请稍后再试'} D:\projects\MJD\mjd.py:116
