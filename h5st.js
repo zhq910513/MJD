@@ -1,5 +1,5 @@
 // 引入模型文件
-const MJDModule = require('./mjd_modules_v3');
+const MJDModule = require('./mjd_modules_v4');
 
 // 外部函数
 function format_timestamp(api_query_time) {

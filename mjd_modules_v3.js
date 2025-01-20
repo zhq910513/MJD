@@ -1,12 +1,6 @@
-(function () {
-    // 算法模块导出定义
-    var _$bB = {
-        'exports': {}
-    };
-    var _$sy = {
-        'exports': {}
-    };
+// 首次发现更新日期 2025年01月10日
 
+(function () {
     // 常量定义
     function _4g4a1(s) {
         var o = '';
@@ -906,6 +900,9 @@
     };   // 3920
 
     // 基础算法定义
+    var _$bB = {
+        'exports': {}
+    };
     var _$lv, _$ld = _$q.uIvoJ(_$IS, f1(0x1d2), f1(0x1df)), _$lc = _$T, _$lE = _$ld, _$lz = Array.prototype,
         _$lN = function (_$rY) {
             var _$rJ = _$rY.splice;
@@ -2115,6 +2112,9 @@
     var _$lK = _$lp.exports;
 
     // 核心算法
+    var _$sy = {
+        'exports': {}
+    };
     !function (_$rY, _$rJ) {
         var kv = f1
             , _$rT = {
