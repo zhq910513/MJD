@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 import json
 import pprint
+import re
 import time
 from urllib.parse import urlencode
 
-from log import log_error
 from mjd_base import MJDBase
+from plugins.log import log_error
+
 
 # 查询链接   https://recharge.m.jd.com/orderDetail?orderId=307843863375&serviceType=3&source=41
 
@@ -17,37 +19,14 @@ class MJDOrder(MJDBase):
         self.sku_price = None
         self.sku_type = None
         self.order_id = order_id
-        self.result = None
+        self.wx_appid = None
+        self.wx_payid = None
+        self.wx_package = None
+        self.wx_pay_enum = None
+        self.wx_prepay_id = None
+        self.sess = None
         super().__init__(*args, **kwargs)
         self.get_account_setting(account=account)
-
-    def return_info(self, code, payment_link=None, order_time=None, order_status=None, card_account=None, card_password=None):
-        error_code_mapping = {
-            "0": "账号不可用",
-            "1": "成功",
-            "2": "SKU详情问题/SKU失效/SKU不可下单",
-            "3": "初始化订单失败",
-            "4": "获取支付信息失败",
-            "5": "获取支付链接失败",
-            "6": "获取订单详情失败",
-            "7": "获取卡密失败",
-            "8": "出现风控",
-            "9": "redis缓存错误",
-            "10": "代理出错",
-            "11": "未知错误",
-            "12": "验证码校验失败"
-        }
-        self.result = {
-            "code": code,
-            "msg": error_code_mapping[str(code)],
-            "sku_id": self.sku_id,
-            "order_id": self.order_id,
-            "payment_link": payment_link,
-            "order_time": order_time,
-            "order_status": order_status,
-            "card_account": card_account,
-            "card_password": card_password,
-        }
 
     @staticmethod
     def handle_post_data(post_data):
@@ -90,7 +69,7 @@ class MJDOrder(MJDBase):
         body_str = self.generate_body_str(body)
 
         # 设备指纹信息
-        eid_token = self.device_fingerprint()
+        eid_token = self.device_eid_token()
         params = {
             'appid': 'tsw-m',
             'functionId': func_api,
@@ -113,6 +92,10 @@ class MJDOrder(MJDBase):
 
         resp = self.get_response('https://api.m.jd.com/api', params=params)
         resp_json = resp.json()
+        if resp_json["code"] == "3":
+            log_error(f"查询SKU详情失败 账号不可用：{self.pt_pin}")
+            return self.return_info(code=0)
+
         if not resp_json.get("result"):
             log_error(f"获取SKU {self.sku_id} 详情失败：{resp_json}")
             return self.return_info(code=2)
@@ -167,7 +150,7 @@ class MJDOrder(MJDBase):
         body_str = self.generate_body_str(body)
 
         # 设备指纹信息
-        eid_token = self.device_fingerprint()
+        eid_token = self.device_eid_token()
         params = {
             'appid': 'tsw-m',
             'functionId': func_api,
@@ -237,7 +220,7 @@ class MJDOrder(MJDBase):
         body_str = self.generate_body_str(body)
 
         # 设备指纹信息
-        eid_token = self.device_fingerprint()
+        eid_token = self.device_eid_token()
         params = {
             'appid': 'tsw-m',
             'functionId': func_api,
@@ -260,15 +243,155 @@ class MJDOrder(MJDBase):
 
         resp = self.get_response('https://api.m.jd.com/api', params=params)
         resp_json = resp.json()
-        print(resp_json)
         if resp_json["msg"] != "成功":
             log_error(f"获取支付信息失败：{resp_json}")
             return self.return_info(code=4)
-        return self.return_info(code=1)
+
+        result_data = resp_json["data"]
+        matchs = re.search(r"appId=([^&]+)&payId=([^&]+)", result_data)
+        if matchs:
+            self.wx_appid, self.wx_payid = matchs.group(1), matchs.group(2)
+
+            # 获取支付链接
+            self.get_wx_payid()
+        else:
+            log_error(f"提取支付信息失败：{resp_json}")
+            return self.return_info(code=16)
 
     # 获取支付链接
-    def get_payment_link(self):
-        ...
+    def get_wx_payid(self):
+        url = "https://api.m.jd.com/client.action"
+        func_api = "platWapWXPay"
+
+        headers = {
+            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Origin': 'https://mpay.m.jd.com',
+            'Pragma': 'no-cache',
+            'Referer': 'https://mpay.m.jd.com/',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-site',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36',
+            'accept': 'application/json, text/plain, */*',
+            'content-type': 'application/x-www-form-urlencoded',
+            'sec-ch-ua': '"Not A(Brand";v="8", "Chromium";v="132", "Google Chrome";v="132"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+            'x-referer-page': 'https://mpay.m.jd.com/mpay.a3bd3c3aaedaa050f2ae.html',
+            'x-rp-client': 'h5_1.0.0',
+        }
+        self.session.headers.clear()
+        self.session.headers.update(headers)
+
+        # 请求时间
+        api_query_time = int(time.time() * 1000)
+
+        # 请求体
+        body = {
+            "appId": self.wx_appid,
+            "payId": self.wx_payid,
+            "eid": self.eid,
+            "source": "mcashier",
+            "origin": "h5",
+            "mcashierTraceId": api_query_time
+        }
+        body_str = self.generate_body_str(body)
+
+        params = {
+            'functionId': func_api,
+            'appid': 'mcashier',
+            'scval': 'mpay',
+        }
+
+        # 合成clt的设备参数
+        input_clt_str = self.generate_clt_str()
+
+        # 签名
+        h5st = self.generate_h5st(device_info=self.device_info, func_api=func_api, input_clt_str=input_clt_str, api_query_time=api_query_time, body_str=body_str)
+        data = {
+            'body': json.dumps(body, separators=(',', ':')),
+            'x-api-eid-token': self.eid_token,
+            'h5st': h5st,
+        }
+
+        resp = self.get_response(url=url, params=params, data=data)
+        resp_json = resp.json()
+        if not resp_json.get("payInfo"):
+            log_error(f"获取微信支付信息失败：{resp_json}")
+            return self.return_info(code=14)
+
+        pay_info = resp_json["payInfo"]
+        mweb_url = pay_info.get("mweb_url", "")
+        self.wx_package = mweb_url.split("package=")[1]
+        self.wx_pay_enum = pay_info.get("payEnum", None)
+        self.wx_prepay_id = pay_info.get("prepayId", None)
+        if not self.wx_package or not self.wx_pay_enum or not self.wx_prepay_id:
+            log_error(f"微信支付参数缺失：{resp_json}")
+            return self.return_info(code=15)
+
+        # 获取验证码
+        self.get_cap_union()
+
+    # 获取验证码信息
+    def get_cap_union(self):
+        url = "https://t.captcha.qq.com/cap_union_prehandle"
+
+        headers = {
+            'Accept': '*/*',
+            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Pragma': 'no-cache',
+            'Referer': 'https://wx.tenpay.com/',
+            'Sec-Fetch-Dest': 'script',
+            'Sec-Fetch-Mode': 'no-cors',
+            'Sec-Fetch-Site': 'cross-site',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36',
+            'sec-ch-ua': '"Not A(Brand";v="8", "Chromium";v="132", "Google Chrome";v="132"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+        }
+        self.session.headers.clear()
+        self.session.headers.update(headers)
+
+        params = {
+            'aid': '2093769752',
+            'protocol': 'https',
+            'accver': '1',
+            'showtype': 'embed',
+            'ua': 'TW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEzMi4wLjAuMCBTYWZhcmkvNTM3LjM2',
+            'noheader': '1',
+            'fb': '0',
+            'aged': '0',
+            'enableAged': '0',
+            'enableDarkMode': 'force',
+            'grayscale': '1',
+            'dyeid': '0',
+            'clientype': '2',
+            'cap_cd': '',
+            'uid': '',
+            'lang': 'zh-cn',
+            'entry_url': 'https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkmweb',
+            'elder_captcha': '0',
+            'js': '/tcaptcha-frame.70f42bb2.js',
+            'login_appid': '',
+            'wb': '1',
+            'version': '1.1.0',
+            'subsid': '1',
+            'callback': '',
+            'sess': '',
+        }
+        resp = self.get_response(url=url, params=params)
+        resp_json = json.loads(re.match(r"\((.*?)\)", resp.text).group(1))
+        if not resp_json:
+            log_error(f"获取验证码信息失败：{resp_json}")
+            return self.return_info(code=17)
+
+        self.sess = resp_json["sess"]
+
+    #
 
     # 查询
     def get_order_detail(self):
@@ -312,12 +435,12 @@ class MJDOrder(MJDBase):
         body_str = self.generate_body_str(body)
 
         # 设备指纹信息
-        eid_token = self.device_fingerprint()
+        eid_token = self.device_eid_token()
         post_data = {
             'appid': 'tsw-m',
             'functionId': func_api,
             't': str(api_query_time),
-            'body': str(body),
+            'body': json.dumps(body, separators=(',', ':')),
             'uuid': self.device_info["uuid"],
             'screen': self.device_info["screen"],
             'x-api-eid-token': eid_token
@@ -332,10 +455,13 @@ class MJDOrder(MJDBase):
         post_data.update({
             'h5st': h5st
         })
-        encode_data = self.handle_post_data(post_data=post_data)
+        post_data = self.handle_post_data(post_data)
 
-        resp = self.get_response('https://api.m.jd.com/api', data=encode_data)
+        resp = self.get_response('https://api.m.jd.com/api', data=post_data)
         resp_json = resp.json()
+        if resp_json["code"] == "3":
+            log_error(f"查询订单详情失败 账号不可用：{self.pt_pin}")
+            return self.return_info(code=0)
         if not resp_json.get("result"):
             log_error(f"查询订单详情失败 订单ID：{self.order_id} 返回数据：{resp_json}")
             return self.return_info(code=6)
@@ -373,18 +499,22 @@ class MJDOrder(MJDBase):
 if __name__ == '__main__':
     _account = {
         ## 自己的
-        # "pt_pin": "zhq91513",
-        # "pt_key": "AAJnhh0eADBEwGwoFKU_L3A6W0jtMPQsGmYAFoVbP5bkNmpOgX26we0e3q3b0sGmp-aPTHv0v5Y"
+        "pt_pin": "zhq91513",
+        "pt_key": "AAJnhh0eADBEwGwoFKU_L3A6W0jtMPQsGmYAFoVbP5bkNmpOgX26we0e3q3b0sGmp-aPTHv0v5Y",
         ## 不可用
         # "pt_pin": "jd_COXQQFzqpVtW",
-        # "pt_key": "AAJnizbmADBmgx2zKBZzOQiDzfAc_w1YKJLckIau5lN_X04_CKVIbVL8_ap-mR-B4Ua92l02SHY"
+        # "pt_key": "AAJnizbmADBmgx2zKBZzOQiDzfAc_w1YKJLckIau5lN_X04_CKVIbVL8_ap-mR-B4Ua92l02SHY",
         ## 可用批量
-        "pt_pin": "jd_gAUwsCxtALiG",
-        "pt_key": "AAJniTWmADDf4Ar2uJqYIJfqWfwv6xzHI6mZSX-Fp3B1dsBsTwlSoRf49JBzaUFINvCeSRN9xI8"
+        # "pt_pin": "jd_gAUwsCxtALiG",
+        # "pt_key": "AAJniTWmADDf4Ar2uJqYIJfqWfwv6xzHI6mZSX-Fp3B1dsBsTwlSoRf49JBzaUFINvCeSRN9xI8",
     }
     _sku_id = "10022039398507"
-    # _order_id = "307843863375"
-    _order_id = "309093899439"
+    _order_id = "307843863375"
+    # _order_id = "309093899439"
+    _app_id = "m_D1vmUq63"
+    _pay_id = "be51da95e038455f9f0b3f4ac4ec5c6f"
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
-    # mo.run_create()
+    # pprint.pp(mo.run_create())
     pprint.pp(mo.run_select())
+    # pprint.pp(mo.get_wx_payid())
+    # pprint.pp(mo.get_cap_union())

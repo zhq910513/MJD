@@ -3,8 +3,7 @@
 import base64
 import hashlib
 import json
-import pprint
-import time
+import random
 from typing import Union
 
 import execjs
@@ -12,10 +11,12 @@ from Crypto.Cipher import DES
 from Crypto.Util.Padding import unpad
 from curl_cffi import requests
 
-from log import log_info
+from plugins.redis_ctl import RedisCtrl
+
 
 # 适应版本
 # js_security_v3_0.1.5
+# h5_file_v5.0.2   2024.12.28
 # h5_file_v5.0.3   2025.01.10
 # h5_file_v5.0.4   2025.01.20
 
@@ -30,71 +31,146 @@ from log import log_info
 # 必须参数
 # pt_pin   来源   cookie
 # pt_key   来源   cookie
-# pt_token   来源   cookie   验证码登陆时服务器返回的
+# pt_token   来源   cookie   验证码登陆时服务器返回的/风控账号必须带
 # WQ_dy1_tk_algo   来源   /request_algo请求结果  保存在localStorage   解析后得到 tk/rd
 
-"""测试值"""
-_fingerprint = "rp3rwp3xadcswp82"  # 更新登录, 更新值
-webglFp = "9ef6901beacde53c5b05944cce35c114"  # 更新登录, 更新值
+# redis 账号状态status  初始状态 None, 0 不可用, 1 可用
 
-tk = "tk03wbbc01c8f18nBTjzyuD03iqEwm1Qhm-1BuZZhhNRhFpghRq0yQqfH8F71y7qHGm0aivM5Z-oJlHINpyhNQRoyWJH"  # 请求request_algo/写入localStorage, 更新值
-rd = "TmNlefpLNV7c"  # 请求request_algo/写入localStorage, 更新值
-
-# 每次请求, 更新值
-eid_token = "jdd036GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQAAAAMUQHLSAMIAAAAACPQHGSRT6WM65YX"
-
-
-# redis 功能
-# 存储账号 + 状态/设备指纹信息
-
-# api返回信息结构约定
+# TODO
+# 破解滑块验证
+# 自动创建设备指纹
+# 自动更新tk/rd
+# 摸清 eid_token 变化
 
 
 class MJDBase(object):
     def __init__(self, *args, **kwargs):
-        self.qq_game_des_key = "2E1ZMAF88CCE5EBE551FR3E9AA6FF322"
-        self._app_id = "8e94a"  # 不变
-        self.canvas = "0fb7f119e21bb6b17b2b0d333a5617bf"  # 不变
-        # 设备变化数据
-
-        # 登录变化数据
-        self._fingerprint = _fingerprint  # 每次登录会变化
-        self.webglFp = webglFp  # 每次登录会变化
+        self.redis = RedisCtrl()
+        self.redis_key = None
 
         # 版本变化数据
         self.h5_version = "h5_file_v5.0.4"  # 每次10天左右会变化版本，modules源码也会跟着变
-        self.time_range = "69"  # js版本固定值,跟随版本变化
 
-        # 请求变化数据
+        self.qq_game_des_key = "2E1ZMAF88CCE5EBE551FR3E9AA6FF322"  # 不变
 
         self.modules = self.init_modules()
         self.proxies = self.get_proxies()
         self.pt_pin = None
         self.pt_key = None
         self.session = None
-        self.device_info = {
-            "fp": self._fingerprint,
-            "tk": tk,  # 首次生成后可保存一段时间
-            "rd": rd,  # 首次生成后可保存一段时间
-            "ai": self._app_id,  # appId
-            "time_range": self.time_range,
-            "canvas": self.canvas,
-            "webglFp": self.webglFp,
-            "ccn": 20,  # 待确认, 可能跟JS版本变化
-            "uuid": "1736842420917134647444",  # 任意
-            "screen": "1920*1080",
-        }
+        self.result = None
+        self.device_info = None
         self.body_info = {
             "version": "1.10",
             "rechargeversion": "12.8",
             "source": 41,
             "orderSource": 41
         }
-        self.extend_info = {
-            "bu1": "0.1.5",
-            "bu3": 54,
-            "bu6": 4,
-            "bu10": 4,
+        self.extend_info = None
+        self.eid = "6GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQ"
+        self.eid_token = "jdd036GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQAAAAMURANCPSQAAAAAC6WPKTPIYVGBRIX"
+
+    @staticmethod
+    def generate_device():
+        device_list = [
+            ({
+                 "fp": "rp3rwp3xadcswp82",
+                 "tk": "tk03w92601c8618nVpKVZT1ZC6AsQ8lrGNZMl11T1wLl_gqVtJBAHYxP4g2-aUwn-mrr6VMUffNSJOkWVPojHpierwcr", # 首次生成后可保存一段时间
+                 "rd": "c6kpZZFCuA11",  # 首次生成后可保存一段时间
+                 "ai": "8e94a",  # appId
+                 "time_range": "69",  # js版本固定值,跟随版本变化
+                 "canvas": "0fb7f119e21bb6b17b2b0d333a5617bf",
+                 "webglFp": "9ef6901beacde53c5b05944cce35c114",
+                 "ccn": 20,  # 待确认, 可能跟JS版本变化
+                 "uuid": "1736842420917134647434",  # 任意
+                 "screen": "1920*1080",
+             },
+             {
+                 "wd": 0,
+                 "l": 0,
+                 "ls": 5,
+                 "wk": 0,
+                 "bu1": "0.1.5",
+                 "bu2": -2,
+                 "bu3": 54,
+                 "bu4": 0,
+                 "bu6": 4,
+                 "bu7": 0,
+                 "bu8": 0,
+                 "bu10": 5,
+             }),
+        ]
+        return random.choice(device_list)
+
+    def redis_initial_account(self):
+        # 检查账号是否存在
+        if not self.redis.exists(self.redis_key):
+            device = self.generate_device()
+            self.device_info = device[0]
+            self.extend_info = device[1]
+            initial_data = {
+                "status": None,  # 初始状态 None, 0 不可用, 1 可用
+                "device_info": self.device_info,
+                "extend_info": self.extend_info,
+            }
+            self.redis.set(self.redis_key, json.dumps(initial_data))
+        else:
+            account_cache = json.loads(self.redis.get(self.redis_key))
+            self.device_info = account_cache["device_info"]
+            self.extend_info = account_cache["extend_info"]
+
+    def redis_update_account(self, field, value):
+        _cache = json.loads(self.redis.get(self.redis_key))
+        if _cache:
+            _cache[field] = value
+
+            # 将更新后的字典写回 Redis
+            self.redis.set(self.redis_key, json.dumps(_cache))
+
+    def return_info(self, code, **kwargs):
+        # 定义错误码映射
+        error_code_mapping = {
+            0: "账号不可用",
+            1: "成功",
+            2: "SKU详情问题/SKU失效/SKU不可下单",
+            3: "初始化订单失败",
+            4: "获取支付信息失败",
+            5: "获取支付链接失败",
+            6: "获取订单详情失败",
+            7: "获取卡密失败",
+            8: "出现风控",
+            9: "redis缓存错误",
+            10: "代理出错",
+            11: "未知错误",
+            12: "验证码校验失败",
+            13: "账号与订单号不匹配",
+            14: "获取微信支付信息失败",
+            15: "微信支付参数缺失",
+            16: "提取支付信息失败",
+            17: "获取验证码信息失败",
+
+        }
+
+        # 确保 code 是整数，避免因字符串 key 导致的 KeyError
+        code = int(code)
+
+        # 更新 Redis 中的账号状态，如果 code 为 0
+        if code == 0:
+            self.redis_update_account("status", 0)
+        if code == 1:
+            self.redis_update_account("status", 1)
+
+        # 组装返回结果
+        self.result = {
+            "code": code,
+            "msg": error_code_mapping.get(code, "未知错误代码"),  # 增加默认错误信息，避免未定义的 code 抛出 KeyError
+            "sku_id": getattr(self, "sku_id", None),  # 使用 getattr 避免属性不存在时抛出异常
+            "order_id": getattr(self, "order_id", None),
+            "payment_link": kwargs.get("payment_link", None),
+            "order_time": kwargs.get("order_time", None),
+            "order_status": kwargs.get("order_status", None),
+            "card_account": kwargs.get("card_account", None),
+            "card_password": kwargs.get("card_password", None),
         }
 
     @staticmethod
@@ -110,6 +186,8 @@ class MJDBase(object):
     def get_account_setting(self, account):
         self.pt_pin = account["pt_pin"]
         self.pt_key = account["pt_key"]
+        self.redis_key = f"mjd_{self.pt_pin}"
+        self.redis_initial_account()
         self.session = self.get_session()
 
     def generate_cookies(self):
@@ -169,8 +247,8 @@ class MJDBase(object):
             print(e)
 
     @staticmethod
-    def device_fingerprint():
-        return eid_token
+    def device_eid_token():
+        return "jdd036GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQAAAAMUQ7LWEFQAAAAADZ2QFJVDYROTPAX"
 
     def generate_clt_str(self):
         input_clt_dict = {
@@ -178,22 +256,9 @@ class MJDBase(object):
             "pp": {
                 "p1": self.pt_pin,
             },
-            "extend": {
-                "wd": 0,
-                "l": 0,
-                "ls": 5,
-                "wk": 0,
-                "bu1": self.extend_info["bu1"],
-                "bu10": self.extend_info["bu10"],
-                "bu2": 0,
-                "bu3": self.extend_info["bu3"],
-                "bu4": 0,
-                "bu5": 0,
-                "bu6": self.extend_info["bu6"],
-                "bu8": 0
-            },
+            "extend": self.extend_info,
             "pf": "Win32",
-            "random": "kA5xZLSc8J",
+            "random": "lWSQofglt7E",
             "v": self.h5_version,
             "canvas": self.device_info["canvas"],
             "webglFp": self.device_info["webglFp"],
@@ -216,20 +281,7 @@ class MJDBase(object):
             "pp": {
                 "p1": self.pt_pin
             },
-            "extend": {
-                "wd": 0,
-                "l": 0,
-                "ls": 5,
-                "wk": 0,
-                "bu1": self.extend_info["bu1"],
-                "bu10": self.extend_info["bu10"],
-                "bu2": 0,
-                "bu3": self.extend_info["bu3"],
-                "bu4": 0,
-                "bu5": 0,
-                "bu6": self.extend_info["bu6"],
-                "bu8": 0
-            },
+            "extend": self.extend_info,
             "pp1": "",
             "bu1": "Error: test err\n    at window.__MICRO_APP_ENVIRONMENT_TEMPORARY__.window.__MICRO_APP_ENVIRONMENT__.window.__MICRO_APP_PROXY_WINDOW__.window.__MICRO_APP_BASE_APPLICATION__.window.document.querySelector (https://storage.360buyimg.com/webcontainer/js_security_v3_0.1.5.js:5:8246)\n    at https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:12099:25\n    at Array.map (<anonymous>)\n    at preload (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:12084:27)\n    at https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:12129:45\n    at T$1 (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:239:10)\n    at Vk (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:6943:14)\n    at Uk (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:6599:12)\n    at Tk (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:6592:5)\n    at Ik (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:6575:7)",
             "w": 1536,
@@ -245,13 +297,13 @@ class MJDBase(object):
             "referer": "https://trade.m.jd.com/",
             "v": self.h5_version,
             "bu2": "    at https://storage.360buyimg.com/webcontainer/js_security_v3_0.1.5.js:5:77173",
-            "canvas": self.canvas,
-            "canvas1": self.canvas,
-            "webglFp": self.webglFp,
-            "webglFp1": self.webglFp,
+            "canvas": self.device_info["canvas"],
+            "canvas1": self.device_info["canvas"],
+            "webglFp": self.device_info["webglFp"],
+            "webglFp1": self.device_info["webglFp"],
             "ccn": self.device_info["ccn"],
-            "ai": self._app_id,
-            "fp": self._fingerprint,
+            "ai": "8e94a",
+            "fp": self.device_info["fp"],
             "wk": 0
         }
         return json.dumps(input_expand_params_dict, indent=2, ensure_ascii=False)
@@ -275,40 +327,7 @@ class MJDBase(object):
         return self.modules.call("get_tk_rd", wq_dy1_tk_algo)
 
     def get_tk_rd(self):
-        headers = {
-            'Accept-Language': 'zh-CN,zh;q=0.9',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
-            'Origin': 'https://recharge.m.jd.com',
-            'Pragma': 'no-cache',
-            'Referer': 'https://recharge.m.jd.com/',
-            'Sec-Fetch-Dest': 'empty',
-            'Sec-Fetch-Mode': 'cors',
-            'Sec-Fetch-Site': 'same-site',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-            'accept': 'application/json',
-            'content-type': 'application/json',
-            'sec-ch-ua': '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-        }
-
-        expand_params = self.generate_expand_params(self.generate_expand_params_str())
-        print(expand_params)
-
-        json_data = {
-            'version': '5.0',
-            'fp': self._fingerprint,
-            'appId': self._app_id,
-            'timestamp': int(time.time() * 1000),
-            'platform': 'web',
-            'expandParams': "YlyXpZ3L3tj83ZXRPp3RjNm8pUDLmYy9mNT710m94QXRfRX9zQXR5xZO3VTMgFTL3Z3L31DB3ZXRPpXNnZ3L3hjB2QXR5xZO3JGNoNDMmFjB2IWMgFWN3EmBmFGA1MDB0QDNp12MzEDL3Z3L3VW9TojA3Ej83ZXRPp3RlVGN2EmN0MjBlJGLkZ2BkNjNkFTA2UDA3UWNgB2A002R5x2RpAV_yQDAiQXR5xZO3BzBiV2MkVjNmNWApRzN38GN3A2B3U2N00GNoBjM3ATN3Z3L3Vm94Ay_4MzR5Z3XtR3A38GNjFGBmNmN1Y2BnRjMoRzM3QDNnFDLoV2AiRzApRXRfRn94Ay_4MzR5Z3XtRnNiVmMixGMfNy-rF2OohXN6M2860S8wQC82Ej96My-qRCAr0DBlgj_2QDAicH_qMzOykD-gEyBpBmNrFjA4Qi_lMiOqxm9pIS8xYX84YXR5Z3R5x2RnFyB3ZXRPp3RmhXNrF286ET_wAjCk5zR5x2RjQXR5xZO3RXRfR390QCAzEz93ZXRPp3RPAF8gMEInY27iRXRfRH_qIz_4QyR5Z3XtR3R5x2R0QyR5Z3XtF2NrVWRfR39pQXR5xZO3RmNr0jE3Z3L3BT93ZXRPp3RscjBrJz-rlzO08z944jB0QiOqxm9pIS8xQXRfRnAqQXR5xZO3VWMcFjBnEi_mAnNcFT9gIEA20z8nEj9zFmMmN2MhNWMh9WNmlWAQQCA1Qi_apD-4ICAVQCA1Qi_qlj_2gXAvgH_rFjAnUT-2Ez9qd3LmYS8l4zR5x2RtQC83ZXRPp3Mo5WRfRX-qQXR5xZOjNGMoZ3L39i_3ZXRPpXMj5WRfRX-3ZXRPp3MmFGN5x2RiQXR5xZO31nMfFmMkB2LmwzOoJDB28WLlZGOhETAr0jOmICAmMCBqJTMkRWL1QmO08z944jB0QiOl4S_1cH_qMzOykD-gEyBpBmNrFjA4Qi_lMiOqxm9pIS8x4XRu0VRlUTR5ZXRroEPkx2NgF2MfNy-rVWA4MjMhJWNs5CA1gD-qNS80Mi94cXAlF2NhJzNqFjAnUT-2Ez9qJS7tIjOscjBr9D_w0C83Y2MmhHAyUz9qIi9qd3LmYS8l4TP5tTE5JCB5ZXR5hTCwRGNf1GLkB2LmwzOoJDB28WLlZGOhETAr0jOmICAmMCBqJTMkRWL1QmO08z944jB0QiOl4S_1cH_qMzOykD-gEyBpBmNrFjA4Qi_lMiOqxm9pIS8x4XRuEURlUTR5ZXRroEPlV2LmJGLjxm9vgHN1UjBi5WMplX70Iz_wcn9lEj9mUjO1IGMn5WAndHAyQCBxMDAncX8hoTAqlj_2gnAs0D7kQTNjN2O08DBncT8mcnOfNS9lIS-xZn-DYX84YXR5Z3_90XNoxGLmR2LmwzOoJDB28WLlZGOhETAr0jOmICAmMCBqJTMkRWL1QmO08z944jB0QiOl4S_1cH_qMzOykD-gEyBpBmNrFjA4Qi_lMiOqxm9pIS8x4XRoJXE5JCB5ZXR5hTCkJ2LgRGNnV2LmwzOoJDB28WLlZGOhETAr0jOmICAmMCBqJTMkRWL1QmO08z944jB0QiOl4S_1cH_qMzOykD-gEyBpBmNrFjA4Qi_lMiOqxm9pIS8xYX84YXR5Z3_90nMnxWMhZ2Noxm9vgHN1UjBi5WMplX70Iz_wcn9lEj9mUjO1IGMn5WAndHAyQCBxMDAncX8hoTAqlj_2gnAs0D7kQTNjN2O08DBncT8mcnOfNS9lIS-xZXA4cT_0QS95JCB5ZXR5hTCwhm9kcD_ggj_rUTKxZX94kzOgUz9nUVRlUTR5ZXRroEMnxGLgZ2Noxm9vgHN1UjBi5WMplX70Iz_wcn9lEj9mUjO1IGMn5WAndHAyQCBxMDAncX8hoTAqlj_2gnAs0D7kQTNjN2O08DBncT8mcnOfNS9lIS-5JCB5ZXR5hTCwBWMn52Lkxm9vgHMrV2OpdkNjcE7l0z9kMDAmck9vc390gD-4Iy_qMzB08iOscjBr9D_w0C83Y2MmhHAyUz9qIi9qd3LmYS8l4TP5Ri_lMDAtEjFgQCAkUyOlgDAsEiBqIzOicTAr0j8rdkCLcFHFUlJQoVFJUlCUMEJXcUFJUlCKQkJQklC6gn8qIz_w8yO6ckEKI1GQ8kCA4kGHYkCJYEJ6c1FW0FG6c0OicTAr0j8rdkCFgFIMglGH01ELElCJYEJ6c1FW0FG6c0OicTAr0j8rdkCAQEJHcVFMEVE6I0GUk1GKQEHDgFI6YUFYckGHMFHMckCr9i_1gD-iYX84YXR5Z3_9Qy90YX8mET85x29qQy9UQXRfRHNkQzR5Z3XtR3R5x2RoZS93ZXRPpH65Z3XpZ3L35G83QXR5ZXRPpXM5x2RjFyB3ZXR5Z3XtZWRfRHMkQzR5ZXR5xZOpZ3L3JG83QXR5ZXRPpXMkZ3L3NG83QXR5ZXRPpXN5x2RnFyB3ZXR5Z3XtNWRfRXNoFyB3ZXR5Z3XtRHMrV2OpRXRfRHNkQzR5ZXR5xZOpZ3L3tj83ZXR5Z3XtFWRfRn9tQXR5ZXRPpXN5x2RtQXR5ZXRPpXN5x2R18yR5ZXR5xp75x2R1gDAl4CA3ZXRPpH65Z3X3NGNkVGLo4z73Z3L3VW93ZXR5Z3XeY3L3ZS93ZXRPp3RlBW75tWMjhD-CYnLphXNoZXELYn9icTAr0jE3Z3L3VD8mQXR5xZO3BmNr9mNkdH-nUzA4MURphXNrZ2OoNGNqFD_qQS-WYHPqsjB08VR0sD-tYXONkVERsVP5BmNr9mNkdX8ws1B08EAtYS9YYHPlBW75tWMjhD-CYnLphXNoZXELYn9icTAr0jExZXNrFmO4oT_wwi_MQXRfRHBkQXR5xZO3BmNr9mNkdH-nUzA4MURphXNrZ2OoNGNqFD_qQS-WYHPqsjB08VR0sD-tYXONkVERsVP5BmNr9mNkdX8ws1B08EAtYS9YYHPlBW75tWMjhD-CYnLphXNoZXELYn9icTAr0jExZXNrF2R5x2RjUzR5Z3XtFWRfRX_pQXR5xZOnZ3L3pD_3ZXRPp3RqsTOrETOxwSOLMFOxwyR5x2RmozR5Z3XtR3GWkX-fQXRfRX_3ZXRPpXN5x2R18yR5Z3XtZWRfRnBiQXR5xp7",
-            'fv': self.h5_version,
-            'localTk': 'tk04w72d1875241lMiszZHhYSnpUXR5Mm9S940m9pQiN24SAgNCBZZJZFLjlr_7Enl1OkY18ws1NxR0_EMDAhN2MmBjN',
-        }
-
-        response = requests.post('https://cactus.jd.com/request_algo', headers=headers, json=json_data)
-        pprint.pp(response.json())
+        ...
 
     @staticmethod
     def decrypt_des(encrypted_data: str, key: str, mode: str = 'ECB') -> Union[dict, None]:
@@ -358,4 +377,4 @@ class MJDBase(object):
 if __name__ == '__main__':
     mj = MJDBase()
     print(mj.generate_tk_rd(
-        "eyJ0ayI6InRrMDN3YmJjMDFjOGYxOG5CVGp6eXVEMDNpcUV3bTFRaG0tMUJ1WlpoaE5SaEZwZ2hScTB5UXFmSDhGNzF5N3FIR20wYWl2TTVaLW9KbEhJTnB5aE5RUm95V0pIIiwiYWxnbyI6ImZ1bmN0aW9uIHRlc3QodGssZnAsdHMsYWksYWxnbyl7dmFyIHJkPSdUbU5sZWZwTE5WN2MnO3ZhciBzdHI9XCJcIi5jb25jYXQodGspLmNvbmNhdChmcCkuY29uY2F0KHRzKS5jb25jYXQoYWkpLmNvbmNhdChyZCk7cmV0dXJuIGFsZ28uTUQ1KHN0cik7fSJ9"))
+        "eyJ0ayI6InRrMDN3OTI2MDFjODYxOG5WcEtWWlQxWkM2QXNROGxyR05aTWwxMVQxd0xsX2dxVnRKQkFIWXhQNGcyLWFVd24tbXJyNlZNVWZmTlNKT2tXVlBvakhwaWVyd2NyIiwiYWxnbyI6ImZ1bmN0aW9uIHRlc3QodGssZnAsdHMsYWksYWxnbyl7dmFyIHJkPSdjNmtwWlpGQ3VBMTEnO3ZhciBzdHI9XCJcIi5jb25jYXQodGspLmNvbmNhdChmcCkuY29uY2F0KHRzKS5jb25jYXQoYWkpLmNvbmNhdChyZCk7cmV0dXJuIGFsZ28uTUQ1KHN0cik7fSJ9"))

@@ -1,5 +1,5 @@
 // 引入模型文件
-const MJDModule = require('./mjd_modules_v4');
+const MJDModule = require('./mjd_modules_v4_20250121');
 
 // 外部函数
 function format_timestamp(api_query_time) {
@@ -63,6 +63,51 @@ function generate_h5st(device_info, func_api, input_clt_str, api_query_time, bod
 
     const gsd = generate_gsd(func_api, ms);
 
-    const h5st_list = [format_timestamp(encrypt_time), device_info.fp, device_info.ai, device_info.tk, gs, "5.0", encrypt_time, clt, gsd];
+    const h5st_list = [
+        format_timestamp(encrypt_time),
+        device_info.fp,
+        device_info.ai,
+        device_info.tk,
+        gs,
+        "5.0",
+        encrypt_time,
+        clt,
+        gsd
+    ];
     return h5st_list.join(";")
 }
+
+
+// // 每次源码迭代需要打开测试是否缺参
+// const _device_info = {
+//     "fp": "rp3rwp3xadcswp82",
+//     "tk": "tk03w92601c8618nVpKVZT1ZC6AsQ8lrGNZMl11T1wLl_gqVtJBAHYxP4g2-aUwn-mrr6VMUffNSJOkWVPojHpierwcr",
+//     "rd": "c6kpZZFCuA11",
+//     "ai": "8e94a",
+//     "time_range": "69",
+//     "canvas": "0fb7f119e21bb6b17b2b0d333a5617bf",
+//     "webglFp": "9ef6901beacde53c5b05944cce35c114",
+//     "ccn": 20,
+//     "uuid": "1736842420917134647444",
+//     "screen": "1920*1080"
+// };
+// const _api_query_time = 1737440700888;
+// const _encrypt_time = 1737447197943;
+// const _input_clt_str = '{\n  "sua": "Windows NT 10.0; Win64; x64",\n  "pp": {\n    "p1": "zhq91513"\n  },\n  "extend": {\n    "wd": 0,\n    "l": 0,\n    "ls": 5,\n    "wk": 0,\n    "bu1": "0.1.5",\n    "bu2": -2,\n    "bu3": 54,\n    "bu4": 0,\n    "bu5": 0,\n    "bu6": 4,\n    "bu7": 0,\n    "bu8": 0,\n    "bu10": 5\n  },\n  "pf": "Win32",\n  "random": "0uzSnHX_UVx",\n  "v": "h5_file_v5.0.4",\n  "canvas": "0fb7f119e21bb6b17b2b0d333a5617bf",\n  "webglFp": "9ef6901beacde53c5b05944cce35c114",\n  "ccn": 20,\n  "fp": "rp3rwp3xadcswp82"\n}';
+// const _body_str = "fd44b1f2d13d1e2bc511dd7ab82c14ce22a7223bd908aaef8606f860c7895417";
+// const _func_api = "getGPOrderDetail";
+//
+// const _clt = generate_clt(_input_clt_str);
+// console.log("_clt: ", _clt);
+// const _ms = generate_ms(_device_info, _encrypt_time);
+// console.log("_ms: ", _ms);
+// const _gs = generate_gs(_body_str, _func_api, _ms, _api_query_time);
+// console.log("_gs: ", _gs);
+// const _gsd = generate_gsd(_func_api, _ms);
+// console.log("_gsd: ", _gsd);
+//
+// console.log(generate_h5st(_device_info, _func_api, _input_clt_str, _api_query_time, _body_str));
+//
+// const _wq_dy1_tk_algo = "eyJ0ayI6InRrMDN3OTI2MDFjODYxOG5WcEtWWlQxWkM2QXNROGxyR05aTWwxMVQxd0xsX2dxVnRKQkFIWXhQNGcyLWFVd24tbXJyNlZNVWZmTlNKT2tXVlBvakhwaWVyd2NyIiwiYWxnbyI6ImZ1bmN0aW9uIHRlc3QodGssZnAsdHMsYWksYWxnbyl7dmFyIHJkPSdjNmtwWlpGQ3VBMTEnO3ZhciBzdHI9XCJcIi5jb25jYXQodGspLmNvbmNhdChmcCkuY29uY2F0KHRzKS5jb25jYXQoYWkpLmNvbmNhdChyZCk7cmV0dXJuIGFsZ28uTUQ1KHN0cik7fSJ9";
+// console.log(get_tk_rd(_wq_dy1_tk_algo));
+

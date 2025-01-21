@@ -812,6 +812,15 @@
         return _$bc === _$yn || _$yq(_$yn, _$bc) && _$bH === _$yn.slice ? _$yL : _$bH;
     };   // 1437
 
+    var _$w3 = _$ya(V1(0x23c), V1(0x123))
+      , _$w4 = _$K
+      , _$w5 = _$w3
+      , _$w6 = Array.prototype
+      , _$w7 = function(_$bc) {
+        var _$bH = _$bc.indexOf;
+        return _$bc === _$w6 || _$w4(_$w6, _$bc) && _$bH === _$w6.indexOf ? _$w5 : _$bH;
+    };   // 1497
+
     var _$NQ = _$ya(V1(0x23c), V1(0x21f))
       , _$NW = _$K
       , _$NG = _$NQ
