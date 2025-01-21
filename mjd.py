@@ -34,6 +34,7 @@ class MJDOrder(MJDBase):
 
     # 获取SKU详情
     def get_sku_info(self):
+        self.order_id = None
         func_api = "getGameDetailBySkuId"
 
         headers = {
@@ -151,7 +152,7 @@ class MJDOrder(MJDBase):
 
         # 设备指纹信息
         eid_token = self.device_eid_token()
-        params = {
+        post_data = {
             'appid': 'tsw-m',
             'functionId': func_api,
             't': str(api_query_time),
@@ -167,11 +168,12 @@ class MJDOrder(MJDBase):
         # 签名
         h5st = self.generate_h5st(device_info=self.device_info, func_api=func_api, input_clt_str=input_clt_str,
                                   api_query_time=api_query_time, body_str=body_str)
-        params.update({
+        post_data.update({
             'h5st': h5st
         })
+        post_data = self.handle_post_data(post_data)
 
-        resp = self.get_response('https://api.m.jd.com/api', params=params)
+        resp = self.get_response('https://api.m.jd.com/api', data=post_data)
         resp_json = resp.json()
         if not resp_json.get("result"):
             log_error(f"获取初始化订单ID失败：{resp_json}")
@@ -253,7 +255,8 @@ class MJDOrder(MJDBase):
             self.wx_appid, self.wx_payid = matchs.group(1), matchs.group(2)
 
             # 获取支付链接
-            self.get_wx_payid()
+            # self.get_wx_payid()
+            return self.return_info(code=1, payment_link=result_data)
         else:
             log_error(f"提取支付信息失败：{resp_json}")
             return self.return_info(code=16)
@@ -292,7 +295,7 @@ class MJDOrder(MJDBase):
         body = {
             "appId": self.wx_appid,
             "payId": self.wx_payid,
-            "eid": self.eid,
+            "eid": self.device_info["eid"],
             "source": "mcashier",
             "origin": "h5",
             "mcashierTraceId": api_query_time
@@ -309,10 +312,11 @@ class MJDOrder(MJDBase):
         input_clt_str = self.generate_clt_str()
 
         # 签名
-        h5st = self.generate_h5st(device_info=self.device_info, func_api=func_api, input_clt_str=input_clt_str, api_query_time=api_query_time, body_str=body_str)
+        h5st = self.generate_h5st(device_info=self.device_info, func_api=func_api, input_clt_str=input_clt_str,
+                                  api_query_time=api_query_time, body_str=body_str)
         data = {
             'body': json.dumps(body, separators=(',', ':')),
-            'x-api-eid-token': self.eid_token,
+            'x-api-eid-token': self.device_info["eid_token"],
             'h5st': h5st,
         }
 
@@ -390,8 +394,6 @@ class MJDOrder(MJDBase):
             return self.return_info(code=17)
 
         self.sess = resp_json["sess"]
-
-    #
 
     # 查询
     def get_order_detail(self):
@@ -498,13 +500,16 @@ class MJDOrder(MJDBase):
 
 if __name__ == '__main__':
     _account = {
-        ## 自己的
-        "pt_pin": "zhq91513",
-        "pt_key": "AAJnhh0eADBEwGwoFKU_L3A6W0jtMPQsGmYAFoVbP5bkNmpOgX26we0e3q3b0sGmp-aPTHv0v5Y",
-        ## 不可用
+        # 自己的
+        # "pt_pin": "zhq91513",
+        # "pt_key": "AAJnhh0eADBEwGwoFKU_L3A6W0jtMPQsGmYAFoVbP5bkNmpOgX26we0e3q3b0sGmp-aPTHv0v5Y",
+        # dd
+        "pt_pin": "jd_LpHciKLtISJq",
+        "pt_key": "AAJnjpH2ADBFK9fUR_2ngUZBXT16TxqjqmLRBq3X7vNnil1BakPA3YosSI9e9ueGsqYPkFuH7VI",
+        # 不可用
         # "pt_pin": "jd_COXQQFzqpVtW",
         # "pt_key": "AAJnizbmADBmgx2zKBZzOQiDzfAc_w1YKJLckIau5lN_X04_CKVIbVL8_ap-mR-B4Ua92l02SHY",
-        ## 可用批量
+        # 可用批量
         # "pt_pin": "jd_gAUwsCxtALiG",
         # "pt_key": "AAJniTWmADDf4Ar2uJqYIJfqWfwv6xzHI6mZSX-Fp3B1dsBsTwlSoRf49JBzaUFINvCeSRN9xI8",
     }
@@ -514,7 +519,7 @@ if __name__ == '__main__':
     _app_id = "m_D1vmUq63"
     _pay_id = "be51da95e038455f9f0b3f4ac4ec5c6f"
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
-    # pprint.pp(mo.run_create())
-    pprint.pp(mo.run_select())
+    pprint.pp(mo.run_create())
+    # pprint.pp(mo.run_select())
     # pprint.pp(mo.get_wx_payid())
     # pprint.pp(mo.get_cap_union())
