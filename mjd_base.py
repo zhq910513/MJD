@@ -71,49 +71,20 @@ class MJDBase(object):
     @staticmethod
     def generate_device():
         device_list = [
-            # ({
-            #      "fp": "rp3rwp3xadcswp82",
-            #      "tk": "tk03w92601c8618nVpKVZT1ZC6AsQ8lrGNZMl11T1wLl_gqVtJBAHYxP4g2-aUwn-mrr6VMUffNSJOkWVPojHpierwcr",
-            #      # 首次生成后可保存一段时间
-            #      "rd": "c6kpZZFCuA11",  # 首次生成后可保存一段时间
-            #      "ai": "8e94a",  # appId
-            #      "time_range": "69",  # js版本固定值,跟随版本变化
-            #      "canvas": "0fb7f119e21bb6b17b2b0d333a5617bf",
-            #      "webglFp": "9ef6901beacde53c5b05944cce35c114",
-            #      "ccn": 20,  # 待确认, 可能跟JS版本变化
-            #      "uuid": "1736842420917134647434",  # 任意
-            #      "screen": "1920*1080",
-            #      "eid": "6GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQ",
-            #      "eid_token": "jdd036GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQAAAAMURANCPSQAAAAAC6WPKTPIYVGBRIX",
-            #  },
-            #  {
-            #      "wd": 0,
-            #      "l": 0,
-            #      "ls": 5,
-            #      "wk": 0,
-            #      "bu1": "0.1.5",
-            #      "bu2": -2,
-            #      "bu3": 54,
-            #      "bu4": 0,
-            #      "bu6": 4,
-            #      "bu7": 0,
-            #      "bu8": 0,
-            #      "bu10": 5,
-            #  }),
             ({
-                 "fp": "pssrxw3cas9ppdp6",
-                 "tk": "tk03w47721a5f18nD3W1N7q3j75HS-W671Vb8eEGmKv88EmOb_ai-xKQksOwetT4Rb9HB-l1w3k52vATm5H_2VeiSjGW",
+                 "fp": "rp3rwp3xadcswp82",
+                 "tk": "tk03wbaec1bec18nxgtFBtl5SefPWIfzafzFnR0Ow6pV5oBhoZL3v3bUv820BaLFJaaCBUYr1I-dJ4PhDIAZvc_wXY6Y",
                  # 首次生成后可保存一段时间
-                 "rd": "YFUCksVCWZCy",  # 首次生成后可保存一段时间
+                 "rd": "AZragq46so1R",  # 首次生成后可保存一段时间
                  "ai": "8e94a",  # appId
                  "time_range": "69",  # js版本固定值,跟随版本变化
-                 "canvas": "266177719f89196f322a77fd545a27b4",
-                 "webglFp": "7629c8bf40a41d50c3d885757469e120",
-                 "ccn": 8,  # 待确认, 可能跟JS版本变化
-                 "uuid": "17373966696341707200910",  # 任意
+                 "canvas": "0fb7f119e21bb6b17b2b0d333a5617bf",
+                 "webglFp": "9ef6901beacde53c5b05944cce35c114",
+                 "ccn": 20,  # 待确认, 可能跟JS版本变化
+                 "uuid": "1736842420917134647434",  # 任意
                  "screen": "1920*1080",
-                 "eid": "4GXYWFHAME4QBRPEKUTD4O2FO5DZGN7KNP2RQ7YFGHUAGCSK4VQBLHKOM3WZGHA4LLHFPCHGC6LQIP5P3QJ6UNP6VQ",
-                 "eid_token": "jdd034GXYWFHAME4QBRPEKUTD4O2FO5DZGN7KNP2RQ7YFGHUAGCSK4VQBLHKOM3WZGHA4LLHFPCHGC6LQIP5P3QJ6UNP6VQAAAAMURGQNFAIAAAAAD7MGIYXKUNTAAQX",
+                 "eid": "6GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQ",
+                 "eid_token": "jdd036GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQAAAAMURT5GIVAAAAAACOEXE3EX444P5AX",
              },
              {
                  "wd": 0,
@@ -121,14 +92,43 @@ class MJDBase(object):
                  "ls": 5,
                  "wk": 0,
                  "bu1": "0.1.5",
-                 "bu2": 0,
+                 "bu2": -2,
                  "bu3": 54,
                  "bu4": 0,
                  "bu6": 4,
                  "bu7": 0,
                  "bu8": 0,
                  "bu10": 5,
-             })
+             }),
+            # ({
+            #      "fp": "pssrxw3cas9ppdp6",
+            #      "tk": "tk03w47721a5f18nD3W1N7q3j75HS-W671Vb8eEGmKv88EmOb_ai-xKQksOwetT4Rb9HB-l1w3k52vATm5H_2VeiSjGW",
+            #      # 首次生成后可保存一段时间
+            #      "rd": "YFUCksVCWZCy",  # 首次生成后可保存一段时间
+            #      "ai": "8e94a",  # appId
+            #      "time_range": "69",  # js版本固定值,跟随版本变化
+            #      "canvas": "266177719f89196f322a77fd545a27b4",
+            #      "webglFp": "7629c8bf40a41d50c3d885757469e120",
+            #      "ccn": 8,  # 待确认, 可能跟JS版本变化
+            #      "uuid": "17373966696341707200910",  # 任意
+            #      "screen": "1920*1080",
+            #      "eid": "4GXYWFHAME4QBRPEKUTD4O2FO5DZGN7KNP2RQ7YFGHUAGCSK4VQBLHKOM3WZGHA4LLHFPCHGC6LQIP5P3QJ6UNP6VQ",
+            #      "eid_token": "jdd034GXYWFHAME4QBRPEKUTD4O2FO5DZGN7KNP2RQ7YFGHUAGCSK4VQBLHKOM3WZGHA4LLHFPCHGC6LQIP5P3QJ6UNP6VQAAAAMURGQNFAIAAAAAD7MGIYXKUNTAAQX",
+            #  },
+            #  {
+            #      "wd": 0,
+            #      "l": 0,
+            #      "ls": 5,
+            #      "wk": 0,
+            #      "bu1": "0.1.5",
+            #      "bu2": 0,
+            #      "bu3": 54,
+            #      "bu4": 0,
+            #      "bu6": 4,
+            #      "bu7": 0,
+            #      "bu8": 0,
+            #      "bu10": 5,
+            #  })
         ]
         return random.choice(device_list)
 
@@ -406,4 +406,4 @@ class MJDBase(object):
 if __name__ == '__main__':
     mj = MJDBase()
     print(mj.generate_tk_rd(
-        "eyJ0ayI6InRrMDN3NDc3MjFhNWYxOG5EM1cxTjdxM2o3NUhTLVc2NzFWYjhlRUdtS3Y4OEVtT2JfYWkteEtRa3NPd2V0VDRSYjlIQi1sMXczazUydkFUbTVIXzJWZWlTakdXIiwiYWxnbyI6ImZ1bmN0aW9uIHRlc3QodGssZnAsdHMsYWksYWxnbyl7dmFyIHJkPSdZRlVDa3NWQ1daQ3knO3ZhciBzdHI9XCJcIi5jb25jYXQodGspLmNvbmNhdChmcCkuY29uY2F0KHRzKS5jb25jYXQoYWkpLmNvbmNhdChyZCk7cmV0dXJuIGFsZ28uTUQ1KHN0cik7fSJ9"))
+        ""))

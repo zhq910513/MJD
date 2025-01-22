@@ -436,8 +436,6 @@ class MJDOrder(MJDBase):
         }
         body_str = self.generate_body_str(body)
 
-        # 设备指纹信息
-        eid_token = self.device_eid_token()
         post_data = {
             'appid': 'tsw-m',
             'functionId': func_api,
@@ -445,7 +443,7 @@ class MJDOrder(MJDBase):
             'body': json.dumps(body, separators=(',', ':')),
             'uuid': self.device_info["uuid"],
             'screen': self.device_info["screen"],
-            'x-api-eid-token': eid_token
+            'x-api-eid-token': self.device_info["eid_token"]
         }
 
         # 合成clt的设备参数
@@ -501,11 +499,11 @@ class MJDOrder(MJDBase):
 if __name__ == '__main__':
     _account = {
         # 自己的
-        # "pt_pin": "zhq91513",
-        # "pt_key": "AAJnhh0eADBEwGwoFKU_L3A6W0jtMPQsGmYAFoVbP5bkNmpOgX26we0e3q3b0sGmp-aPTHv0v5Y",
+        "pt_pin": "zhq91513",
+        "pt_key": "AAJnhh0eADBEwGwoFKU_L3A6W0jtMPQsGmYAFoVbP5bkNmpOgX26we0e3q3b0sGmp-aPTHv0v5Y",
         # dd
-        "pt_pin": "jd_LpHciKLtISJq",
-        "pt_key": "AAJnjpH2ADBFK9fUR_2ngUZBXT16TxqjqmLRBq3X7vNnil1BakPA3YosSI9e9ueGsqYPkFuH7VI",
+        # "pt_pin": "jd_LpHciKLtISJq",
+        # "pt_key": "AAJnjpH2ADBFK9fUR_2ngUZBXT16TxqjqmLRBq3X7vNnil1BakPA3YosSI9e9ueGsqYPkFuH7VI",
         # 不可用
         # "pt_pin": "jd_COXQQFzqpVtW",
         # "pt_key": "AAJnizbmADBmgx2zKBZzOQiDzfAc_w1YKJLckIau5lN_X04_CKVIbVL8_ap-mR-B4Ua92l02SHY",
@@ -519,7 +517,7 @@ if __name__ == '__main__':
     _app_id = "m_D1vmUq63"
     _pay_id = "be51da95e038455f9f0b3f4ac4ec5c6f"
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
-    pprint.pp(mo.run_create())
-    # pprint.pp(mo.run_select())
+    # pprint.pp(mo.run_create())
+    pprint.pp(mo.run_select())
     # pprint.pp(mo.get_wx_payid())
     # pprint.pp(mo.get_cap_union())
