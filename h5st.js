@@ -1,5 +1,6 @@
 // 引入模型文件
-const MJDModule = require('./mjd_modules_v4_20250121');
+const MJDModule = require('./mjd_modules_v5_20250131');
+// console.log(MJDModule);
 
 // 外部函数
 function format_timestamp(api_query_time) {
@@ -42,13 +43,15 @@ function generate_ms(device_info, encrypt_time) {
 
 function generate_gs(body_str, func_api, ms, api_query_time) {
     const input_gs_str = `${ms}appid:tsw-m&body:${body_str}&functionId:${func_api}&t:${api_query_time}${ms}`;
-    const gs_words = MJDModule.MD5(input_gs_str);
+    // const gs_words = MJDModule.MD5(input_gs_str);
+    const gs_words = MJDModule.SHA256(input_gs_str);
     return gs_words.toString();
 }
 
 function generate_gsd(func_api, ms) {
     const input_gsd_str = `${ms}appid:tsw-m&functionId:${func_api}${ms}`;
-    const gsd_words = MJDModule.MD5(input_gsd_str);
+    // const gsd_words = MJDModule.MD5(input_gsd_str);
+    const gsd_words = MJDModule.SHA256(input_gsd_str);
     return gsd_words.toString();
 }
 
@@ -80,11 +83,11 @@ function generate_h5st(device_info, func_api, input_clt_str, api_query_time, bod
 
 // // 每次源码迭代需要打开测试是否缺参
 // const _device_info = {
-//     "fp": "rp3rwp3xadcswp82",
-//     "tk": "tk03w92601c8618nVpKVZT1ZC6AsQ8lrGNZMl11T1wLl_gqVtJBAHYxP4g2-aUwn-mrr6VMUffNSJOkWVPojHpierwcr",
-//     "rd": "c6kpZZFCuA11",
+//     "fp": "cxrwspdpaaapd3a9",
+//     "tk": "tk03w99101bcd18npK0aXAlMfO0e4UdVNktyDktaw507Jbd4f8PmCu-0n6D7j4Km__zCbEvwKbUiLS5XqNHbpAV6FTxM",
+//     "rd": "VHDPvCbwZ1yv",
 //     "ai": "8e94a",
-//     "time_range": "69",
+//     "time_range": "60",
 //     "canvas": "0fb7f119e21bb6b17b2b0d333a5617bf",
 //     "webglFp": "9ef6901beacde53c5b05944cce35c114",
 //     "ccn": 20,
@@ -92,7 +95,7 @@ function generate_h5st(device_info, func_api, input_clt_str, api_query_time, bod
 //     "screen": "1920*1080"
 // };
 // const _api_query_time = 1737440700888;
-// const _encrypt_time = 1737447197943;
+// const _encrypt_time = 1738296938010;
 // const _input_clt_str = '{\n  "sua": "Windows NT 10.0; Win64; x64",\n  "pp": {\n    "p1": "zhq91513"\n  },\n  "extend": {\n    "wd": 0,\n    "l": 0,\n    "ls": 5,\n    "wk": 0,\n    "bu1": "0.1.5",\n    "bu2": -2,\n    "bu3": 54,\n    "bu4": 0,\n    "bu5": 0,\n    "bu6": 4,\n    "bu7": 0,\n    "bu8": 0,\n    "bu10": 5\n  },\n  "pf": "Win32",\n  "random": "0uzSnHX_UVx",\n  "v": "h5_file_v5.0.4",\n  "canvas": "0fb7f119e21bb6b17b2b0d333a5617bf",\n  "webglFp": "9ef6901beacde53c5b05944cce35c114",\n  "ccn": 20,\n  "fp": "rp3rwp3xadcswp82"\n}';
 // const _body_str = "fd44b1f2d13d1e2bc511dd7ab82c14ce22a7223bd908aaef8606f860c7895417";
 // const _func_api = "getGPOrderDetail";

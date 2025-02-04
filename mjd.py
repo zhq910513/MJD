@@ -452,6 +452,7 @@ class MJDOrder(MJDBase):
         # 签名
         h5st = self.generate_h5st(device_info=self.device_info, func_api=func_api, input_clt_str=input_clt_str,
                                   api_query_time=api_query_time, body_str=body_str)
+
         post_data.update({
             'h5st': h5st
         })
@@ -500,7 +501,7 @@ if __name__ == '__main__':
     _account = {
         # 自己的
         "pt_pin": "zhq91513",
-        "pt_key": "AAJnhh0eADBEwGwoFKU_L3A6W0jtMPQsGmYAFoVbP5bkNmpOgX26we0e3q3b0sGmp-aPTHv0v5Y",
+        "pt_key": "AAJnjAKLADAKXpZFQ2cmqFTN-XbDpDXuJzhfycVFhniv-UGwHhtR8dnOXpv4PVD4Q_iQBVG3bTo",
         # dd
         # "pt_pin": "jd_LpHciKLtISJq",
         # "pt_key": "AAJnjpH2ADBFK9fUR_2ngUZBXT16TxqjqmLRBq3X7vNnil1BakPA3YosSI9e9ueGsqYPkFuH7VI",
@@ -513,7 +514,7 @@ if __name__ == '__main__':
     }
     _sku_id = "10022039398507"
     _order_id = "307843863375"
-    # _order_id = "309093899439"
+    # _order_id = "309610598434"
     _app_id = "m_D1vmUq63"
     _pay_id = "be51da95e038455f9f0b3f4ac4ec5c6f"
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)

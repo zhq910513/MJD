@@ -49,7 +49,7 @@ class MJDBase(object):
         self.redis_key = None
 
         # 版本变化数据
-        self.h5_version = "h5_file_v5.0.4"  # 每次10天左右会变化版本，modules源码也会跟着变
+        self.h5_version = "h5_file_v5.0.5"  # 每次10天左右会变化版本，modules源码也会跟着变
 
         self.qq_game_des_key = "2E1ZMAF88CCE5EBE551FR3E9AA6FF322"  # 不变
 
@@ -72,19 +72,19 @@ class MJDBase(object):
     def generate_device():
         device_list = [
             ({
-                 "fp": "rp3rwp3xadcswp82",
-                 "tk": "tk03wbaec1bec18nxgtFBtl5SefPWIfzafzFnR0Ow6pV5oBhoZL3v3bUv820BaLFJaaCBUYr1I-dJ4PhDIAZvc_wXY6Y",
+                 "fp": "33c3waa3w9srdp20",
+                 "tk": "tk03wb57b1cb818npUvd183epiT46UHae_Hl_qeuG6RuV3ZpCk5isa6ts0awKjRGneh93ADDwCj9o6iis3ZHvqZ0Xvza",
                  # 首次生成后可保存一段时间
-                 "rd": "AZragq46so1R",  # 首次生成后可保存一段时间
+                 "rd": "4FNLKdY4lQCH",  # 首次生成后可保存一段时间
                  "ai": "8e94a",  # appId
-                 "time_range": "69",  # js版本固定值,跟随版本变化
+                 "time_range": "60",  # js版本固定值,跟随版本变化
                  "canvas": "0fb7f119e21bb6b17b2b0d333a5617bf",
-                 "webglFp": "9ef6901beacde53c5b05944cce35c114",
-                 "ccn": 20,  # 待确认, 可能跟JS版本变化
-                 "uuid": "1736842420917134647434",  # 任意
-                 "screen": "1920*1080",
-                 "eid": "6GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQ",
-                 "eid_token": "jdd036GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQAAAAMURT5GIVAAAAAACOEXE3EX444P5AX",
+                 "webglFp": "bffcabdb03c4cabf090048ad6f96e568",
+                 "ccn": 8,  # 待确认, 可能跟JS版本变化
+                 "uuid": "1737228844272158324158",  # 任意
+                 "screen": "2160*1440",
+                 "eid": "N5ENAHSQJ4LCSHAZU6V4ONIBT7H5OWJ7QAT5JANZPLGQUUA2LQVA73SQCFPSMNNODES5ENJECTHFIXO6QZSEYYQTCQ",
+                 "eid_token": "jdd03N5ENAHSQJ4LCSHAZU6V4ONIBT7H5OWJ7QAT5JANZPLGQUUA2LQVA73SQCFPSMNNODES5ENJECTHFIXO6QZSEYYQTCQAAAAMUYA5HK2YAAAAACYR72WL2YEBZ4UX",
              },
              {
                  "wd": 0,
@@ -92,8 +92,8 @@ class MJDBase(object):
                  "ls": 5,
                  "wk": 0,
                  "bu1": "0.1.5",
-                 "bu2": -2,
-                 "bu3": 54,
+                 "bu2": 0,
+                 "bu3": 38,
                  "bu4": 0,
                  "bu6": 4,
                  "bu7": 0,
@@ -406,4 +406,4 @@ class MJDBase(object):
 if __name__ == '__main__':
     mj = MJDBase()
     print(mj.generate_tk_rd(
-        ""))
+        "eyJ0ayI6InRrMDN3YjU3YjFjYjgxOG5wVXZkMTgzZXBpVDQ2VUhhZV9IbF9xZXVHNlJ1VjNacENrNWlzYTZ0czBhd0tqUkduZWg5M0FERHdDajlvNmlpczNaSHZxWjBYdnphIiwiYWxnbyI6ImZ1bmN0aW9uIHRlc3QodGssZnAsdHMsYWksYWxnbyl7dmFyIHJkPSc0Rk5MS2RZNGxRQ0gnO3ZhciBzdHI9XCJcIi5jb25jYXQodGspLmNvbmNhdChmcCkuY29uY2F0KHRzKS5jb25jYXQoYWkpLmNvbmNhdChyZCk7cmV0dXJuIGFsZ28uTUQ1KHN0cik7fSJ9"))
