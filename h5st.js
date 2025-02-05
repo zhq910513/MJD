@@ -80,6 +80,11 @@ function generate_h5st(device_info, func_api, input_clt_str, api_query_time, bod
     return h5st_list.join(";")
 }
 
+function generate_extend_params(input_extend_str) {
+    const extend_words = MJDModule.enc.Latin1.parse(input_extend_str);
+    return MJDModule.enc.Base64.encode(extend_words);
+}
+
 
 // // 每次源码迭代需要打开测试是否缺参
 // const _device_info = {
@@ -113,4 +118,3 @@ function generate_h5st(device_info, func_api, input_clt_str, api_query_time, bod
 //
 // const _wq_dy1_tk_algo = "eyJ0ayI6InRrMDN3OTI2MDFjODYxOG5WcEtWWlQxWkM2QXNROGxyR05aTWwxMVQxd0xsX2dxVnRKQkFIWXhQNGcyLWFVd24tbXJyNlZNVWZmTlNKT2tXVlBvakhwaWVyd2NyIiwiYWxnbyI6ImZ1bmN0aW9uIHRlc3QodGssZnAsdHMsYWksYWxnbyl7dmFyIHJkPSdjNmtwWlpGQ3VBMTEnO3ZhciBzdHI9XCJcIi5jb25jYXQodGspLmNvbmNhdChmcCkuY29uY2F0KHRzKS5jb25jYXQoYWkpLmNvbmNhdChyZCk7cmV0dXJuIGFsZ28uTUQ1KHN0cik7fSJ9";
 // console.log(get_tk_rd(_wq_dy1_tk_algo));
-

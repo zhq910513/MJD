@@ -14,6 +14,8 @@ from plugins.log import log_error
 
 class MJDOrder(MJDBase):
     def __init__(self, account, sku_id, order_id=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.account = account
         self.sku_id = sku_id
         self.brand_id = None
         self.sku_price = None
@@ -25,7 +27,6 @@ class MJDOrder(MJDBase):
         self.wx_pay_enum = None
         self.wx_prepay_id = None
         self.sess = None
-        super().__init__(*args, **kwargs)
         self.get_account_setting(account=account)
 
     @staticmethod
@@ -501,7 +502,8 @@ if __name__ == '__main__':
     _account = {
         # 自己的
         "pt_pin": "zhq91513",
-        "pt_key": "AAJnjAKLADAKXpZFQ2cmqFTN-XbDpDXuJzhfycVFhniv-UGwHhtR8dnOXpv4PVD4Q_iQBVG3bTo",
+        # "pt_key": "AAJnjAKLADAKXpZFQ2cmqFTN-XbDpDXuJzhfycVFhniv-UGwHhtR8dnOXpv4PVD4Q_iQBVG3bTo",
+        "pt_key": "AAJnhh0eADBEwGwoFKU_L3A6W0jtMPQsGmYAFoVbP5bkNmpOgX26we0e3q3b0sGmp-aPTHv0v5Y",
         # dd
         # "pt_pin": "jd_LpHciKLtISJq",
         # "pt_key": "AAJnjpH2ADBFK9fUR_2ngUZBXT16TxqjqmLRBq3X7vNnil1BakPA3YosSI9e9ueGsqYPkFuH7VI",
@@ -519,6 +521,7 @@ if __name__ == '__main__':
     _pay_id = "be51da95e038455f9f0b3f4ac4ec5c6f"
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
     # pprint.pp(mo.run_create())
-    pprint.pp(mo.run_select())
+    # pprint.pp(mo.run_select())
     # pprint.pp(mo.get_wx_payid())
     # pprint.pp(mo.get_cap_union())
+    mo.generate_device()
