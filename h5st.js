@@ -1,6 +1,6 @@
 // 引入模型文件
 const MJDModule = require('./mjd_modules_v5_20250131');
-// console.log(MJDModule);
+console.log(MJDModule);
 
 // 外部函数
 function format_timestamp(api_query_time) {
@@ -83,6 +83,11 @@ function generate_h5st(device_info, func_api, input_clt_str, api_query_time, bod
 function generate_extend_params(input_extend_str) {
     const extend_words = MJDModule.enc.Latin1.parse(input_extend_str);
     return MJDModule.enc.Base64.encode(extend_words);
+}
+
+function generate_device_fp(input_webglFp_str) {
+    const webglFp_words = MJDModule.MD5(input_webglFp_str);
+    return webglFp_words.toString();
 }
 
 

@@ -14,20 +14,19 @@ from plugins.log import log_error
 
 class MJDOrder(MJDBase):
     def __init__(self, account, sku_id, order_id=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.account = account
+        super().__init__(account=account, order_id=order_id)
+        self.get_account_setting()
         self.sku_id = sku_id
         self.brand_id = None
         self.sku_price = None
         self.sku_type = None
-        self.order_id = order_id
         self.wx_appid = None
         self.wx_payid = None
         self.wx_package = None
         self.wx_pay_enum = None
         self.wx_prepay_id = None
         self.sess = None
-        self.get_account_setting(account=account)
+
 
     @staticmethod
     def handle_post_data(post_data):
@@ -95,7 +94,7 @@ class MJDOrder(MJDBase):
         resp = self.get_response('https://api.m.jd.com/api', params=params)
         resp_json = resp.json()
         if resp_json["code"] == "3":
-            log_error(f"查询SKU详情失败 账号不可用：{self.pt_pin}")
+            log_error(f"查询SKU详情失败 账号不可用：{self.account["pt_pin"]}")
             return self.return_info(code=0)
 
         if not resp_json.get("result"):
@@ -462,7 +461,7 @@ class MJDOrder(MJDBase):
         resp = self.get_response('https://api.m.jd.com/api', data=post_data)
         resp_json = resp.json()
         if resp_json["code"] == "3":
-            log_error(f"查询订单详情失败 账号不可用：{self.pt_pin}")
+            log_error(f"查询订单详情失败 账号不可用：{self.account["pt_pin"]}")
             return self.return_info(code=0)
         if not resp_json.get("result"):
             log_error(f"查询订单详情失败 订单ID：{self.order_id} 返回数据：{resp_json}")
@@ -503,7 +502,7 @@ if __name__ == '__main__':
         # 自己的
         "pt_pin": "zhq91513",
         # "pt_key": "AAJnjAKLADAKXpZFQ2cmqFTN-XbDpDXuJzhfycVFhniv-UGwHhtR8dnOXpv4PVD4Q_iQBVG3bTo",
-        "pt_key": "AAJnhh0eADBEwGwoFKU_L3A6W0jtMPQsGmYAFoVbP5bkNmpOgX26we0e3q3b0sGmp-aPTHv0v5Y",
+        "pt_key": "AAJnpCesADAxbvctVtaJQCr6aM0FUC1rYjxpt6aTC-5HxhmU4L7qKEg8_sK2ivOwbyXa69uQecs",   # edge
         # dd
         # "pt_pin": "jd_LpHciKLtISJq",
         # "pt_key": "AAJnjpH2ADBFK9fUR_2ngUZBXT16TxqjqmLRBq3X7vNnil1BakPA3YosSI9e9ueGsqYPkFuH7VI",
@@ -521,7 +520,7 @@ if __name__ == '__main__':
     _pay_id = "be51da95e038455f9f0b3f4ac4ec5c6f"
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
     # pprint.pp(mo.run_create())
-    # pprint.pp(mo.run_select())
+    pprint.pp(mo.run_select())
     # pprint.pp(mo.get_wx_payid())
     # pprint.pp(mo.get_cap_union())
-    mo.generate_device()
+    # mo.generate_device()
