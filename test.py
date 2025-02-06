@@ -18,6 +18,8 @@ headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0',
 }
 
+# 相同localTk 已验证切换设备可用
+# TODO localTk失效多久/切换账号是否可用
 json_data = {
     'version': '5.0',
     'fp': 'cdxcxdwwpsr93dm1',
@@ -31,6 +33,3 @@ json_data = {
 
 # response = requests.post('https://cactus.jd.com/request_algo', headers=headers, json=json_data)
 # print(response.json())
-
-print(int(time.time()*1000))
-print(1738830472155)
