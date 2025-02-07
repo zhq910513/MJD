@@ -40,9 +40,9 @@ from plugins.redis_ctl import RedisCtrl
 # redis 账号状态status  初始状态 None, 0 不可用, 1 可用
 
 # TODO
-# 破解滑块验证
-# 自动创建设备指纹
-# 自动更新tk/rd
+# 破解滑块验证  Done
+# 自动创建设备指纹  Done
+# 自动更新tk/rd  Done
 # 摸清 eid_token 变化
 
 
