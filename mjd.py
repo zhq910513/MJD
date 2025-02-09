@@ -27,7 +27,6 @@ class MJDOrder(MJDBase):
         self.wx_prepay_id = None
         self.sess = None
 
-
     @staticmethod
     def handle_post_data(post_data):
         return urlencode(post_data).replace("%2A", "*").replace("%27", "%22").replace("+", "")
@@ -94,7 +93,7 @@ class MJDOrder(MJDBase):
         resp = self.get_response('https://api.m.jd.com/api', params=params)
         resp_json = resp.json()
         if resp_json["code"] == "3":
-            log_error(f"查询SKU详情失败 账号不可用：{self.account["pt_pin"]}")
+            log_error(f"查询SKU详情失败 账号不可用：{self.account['pt_pin']}")
             return self.return_info(code=0)
 
         if not resp_json.get("result"):
@@ -245,6 +244,7 @@ class MJDOrder(MJDBase):
 
         resp = self.get_response('https://api.m.jd.com/api', params=params)
         resp_json = resp.json()
+        pprint.pp(resp_json)
         if resp_json["msg"] != "成功":
             log_error(f"获取支付信息失败：{resp_json}")
             return self.return_info(code=4)
@@ -255,14 +255,15 @@ class MJDOrder(MJDBase):
             self.wx_appid, self.wx_payid = matchs.group(1), matchs.group(2)
 
             # 获取支付链接
-            # self.get_wx_payid()
-            return self.return_info(code=1, payment_link=result_data)
+            self.get_wx_payid()
+            # return self.return_info(code=1, payment_link=result_data)
         else:
             log_error(f"提取支付信息失败：{resp_json}")
             return self.return_info(code=16)
 
     # 获取支付链接
     def get_wx_payid(self):
+        print("platWapWXPay")
         url = "https://api.m.jd.com/client.action"
         func_api = "platWapWXPay"
 
@@ -314,6 +315,7 @@ class MJDOrder(MJDBase):
         # 签名
         h5st = self.generate_h5st(device_info=self.device_info, func_api=func_api, input_clt_str=input_clt_str,
                                   api_query_time=api_query_time, body_str=body_str)
+        print(h5st)
         data = {
             'body': json.dumps(body, separators=(',', ':')),
             'x-api-eid-token': self.device_info["eid_token"],
@@ -322,6 +324,7 @@ class MJDOrder(MJDBase):
 
         resp = self.get_response(url=url, params=params, data=data)
         resp_json = resp.json()
+        pprint.pp(resp_json)
         if not resp_json.get("payInfo"):
             log_error(f"获取微信支付信息失败：{resp_json}")
             return self.return_info(code=14)
@@ -336,7 +339,7 @@ class MJDOrder(MJDBase):
             return self.return_info(code=15)
 
         # 获取验证码
-        self.get_cap_union()
+        # self.get_cap_union()
 
     # 获取验证码信息
     def get_cap_union(self):
@@ -461,7 +464,7 @@ class MJDOrder(MJDBase):
         resp = self.get_response('https://api.m.jd.com/api', data=post_data)
         resp_json = resp.json()
         if resp_json["code"] == "3":
-            log_error(f"查询订单详情失败 账号不可用：{self.account["pt_pin"]}")
+            log_error(f"查询订单详情失败 账号不可用：{self.account['pt_pin']}")
             return self.return_info(code=0)
         if not resp_json.get("result"):
             log_error(f"查询订单详情失败 订单ID：{self.order_id} 返回数据：{resp_json}")
@@ -500,27 +503,26 @@ class MJDOrder(MJDBase):
 if __name__ == '__main__':
     _account = {
         # 自己的
-        # "pt_pin": "zhq91513",
-        # "pt_key": "AAJnjAKLADAKXpZFQ2cmqFTN-XbDpDXuJzhfycVFhniv-UGwHhtR8dnOXpv4PVD4Q_iQBVG3bTo",
+        "pt_pin": "zhq91513",
+        "pt_key": "AAJnjAKLADAKXpZFQ2cmqFTN-XbDpDXuJzhfycVFhniv-UGwHhtR8dnOXpv4PVD4Q_iQBVG3bTo",
         # "pt_key": "AAJnpCesADAxbvctVtaJQCr6aM0FUC1rYjxpt6aTC-5HxhmU4L7qKEg8_sK2ivOwbyXa69uQecs",   # edge
         # dd
         # "pt_pin": "jd_LpHciKLtISJq",
         # "pt_key": "AAJnjpH2ADBFK9fUR_2ngUZBXT16TxqjqmLRBq3X7vNnil1BakPA3YosSI9e9ueGsqYPkFuH7VI",
         # 不可用
-        "pt_pin": "jd_COXQQFzqpVtW",
-        "pt_key": "AAJnizbmADBmgx2zKBZzOQiDzfAc_w1YKJLckIau5lN_X04_CKVIbVL8_ap-mR-B4Ua92l02SHY",
+        # "pt_pin": "jd_COXQQFzqpVtW",
+        # "pt_key": "AAJnizbmADBmgx2zKBZzOQiDzfAc_w1YKJLckIau5lN_X04_CKVIbVL8_ap-mR-B4Ua92l02SHY",
         # "pt_pin": "jd_gAUwsCxtALiG",
         # "pt_key": "AAJniTWmADDf4Ar2uJqYIJfqWfwv6xzHI6mZSX-Fp3B1dsBsTwlSoRf49JBzaUFINvCeSRN9xI8",
         # 可用批量
     }
     _sku_id = "10022039398507"
-    _order_id = "307843863375"
-    # _order_id = "309610598434"
-    _app_id = "m_D1vmUq63"
-    _pay_id = "be51da95e038455f9f0b3f4ac4ec5c6f"
+    # _order_id = "307843863375"
+    _order_id = "309443753492"
+    # _order_id = "309056534641"   # dd
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
     # pprint.pp(mo.run_create())
-    pprint.pp(mo.run_select())
-    # pprint.pp(mo.get_wx_payid())
+    # pprint.pp(mo.run_select())
+    pprint.pp(mo.get_payinfo())
     # pprint.pp(mo.get_cap_union())
     # mo.generate_device()

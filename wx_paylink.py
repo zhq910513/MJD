@@ -7,6 +7,7 @@ B3CSS = "jdd036GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDP
 #     "data": "https://mpay.m.jd.com/mpay.a3bd3c3aaedaa050f2ae.html?appId=m_L0qE9db3&payId=76671cf4a9d84e9bb37aa95155f79cae&orderId=308999088793",
 #     "class": "com.jd.card.gw.api.domain.base.result.Result"
 # }
+# https://mpay.m.jd.com/mpay.dcf1ecf4a58ae843d3e0.html?appId=m_L0qE9db3&payId=42efb763bd5c4c6ea8d8d69e72dcc1ac&orderId=309974964391
 # ------------------------------
 url = "https://api.m.jd.com/client.action"
 cookies = {
@@ -255,22 +256,3 @@ params = {
 # requests.get
 
 # {"retcode":1,"retmsg":"OK","deeplink":"weixin://wap/pay?prepayid%3Dwx21170546993305dcf3c8bb8c05d0310001&package=1643033090&noncestr=1737450369&sign=29dc39e678f8b35668d319ea6c9037de"}
-
-"""
-    # local
-    tk   tk03waa271cc918nvdX4ROnJmtHBHmy6_OEc9ZWWTFq3iCRCcUJO3ODrIZQRwQzl4l-qLf8SlelfZQwx6oZLEmHPqxmt
-    
-    # api 73806
-    tk   tk03waa271cc918nvdX4ROnJmtHBHmy6_OEc9ZWWTFq3iCRCcUJO3ODrIZQRwQzl4l-qLf8SlelfZQwx6oZLEmHPqxmt
-    
-    # api 8e94a
-    # 有 algo
-    tk   
-    rd   
-    eid_token(3AB9D23F7A4B3CSS)   jdd036GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQAAAAMURU2OW2AAAAAACCQLRMSAA7ELEQX
-    
-    # 无 algo
-    tk   
-    rd   
-    eid_token(3AB9D23F7A4B3CSS)   
-"""

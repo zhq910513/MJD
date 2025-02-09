@@ -44,6 +44,7 @@ from plugins.redis_ctl import RedisCtrl
 # 自动创建设备指纹  Done
 # 自动更新tk/rd  Done
 # 摸清 eid_token 变化
+# 继续细分 账号不可用时 风控账号/rd-tk失效
 
 
 class MJDBase(object):
@@ -185,42 +186,42 @@ class MJDBase(object):
         webglFp = self.generate_webglFp(device)
 
         extend = {
-        "wd": 0,
-        "l": 0,
-        "ls": 5,
-        "wk": 0,
-        "bu1": "0.1.5",
-        "bu2": 0,
-        "bu3": 54,
-        "bu4": 0,
-        "bu5": 0,
-        "bu6": 4,
-        "bu7": 0,
-        "bu8": 0,
-        "bu10": 5
-    }
+            "wd": 0,
+            "l": 0,
+            "ls": 5,
+            "wk": 0,
+            "bu1": "0.1.5",
+            "bu2": 0,
+            "bu3": 54,
+            "bu4": 0,
+            "bu5": 0,
+            "bu6": 4,
+            "bu7": 0,
+            "bu8": 0,
+            "bu10": 5
+        }
         expand_params = self.generate_expand_params(device=device, device_fp=device_fp, extend=extend)
         self.refresh_tk_rd(expand_params)
         return ({
-                 "webglFp": webglFp,
-                "deviceFp": device_fp,
-                "expandParams": expand_params,
-                 "fp": self.fp,
-                 "tk": self.tk,
-                 "rd": self.rd,
-                 "eid": "AUPL37Q53QK76OL62SP75SPDVXTIU23DXBCZLBOAFVFW4UHD4QSM55A4VWMRBXEP7EY6SJBDYBILKDTR2GDKGIE3NI",
-                 "eid_token": "jdd03AUPL37Q53QK76OL62SP75SPDVXTIU23DXBCZLBOAFVFW4UHD4QSM55A4VWMRBXEP7EY6SJBDYBILKDTR2GDKGIE3NIAAAAMU3IUUVCIAAAAAC2DABMA3SQM4CEX",
-                 "time_range": "60",  # js版本固定值,跟随版本变化
+                    "webglFp": webglFp,
+                    "deviceFp": device_fp,
+                    "expandParams": expand_params,
+                    "fp": self.fp,
+                    "tk": self.tk,
+                    "rd": self.rd,
+                    "eid": "AUPL37Q53QK76OL62SP75SPDVXTIU23DXBCZLBOAFVFW4UHD4QSM55A4VWMRBXEP7EY6SJBDYBILKDTR2GDKGIE3NI",
+                    "eid_token": "jdd03AUPL37Q53QK76OL62SP75SPDVXTIU23DXBCZLBOAFVFW4UHD4QSM55A4VWMRBXEP7EY6SJBDYBILKDTR2GDKGIE3NIAAAAMU3IUUVCIAAAAAC2DABMA3SQM4CEX",
+                    "time_range": "60",  # js版本固定值,跟随版本变化
 
-                 "ccn": device["ccn"],  # 待确认, 可能跟JS版本变化
-                 "uuid": "1737228844272158324158",  # 任意
-                 "screen": device["screen"],
+                    "ccn": device["ccn"],  # 待确认, 可能跟JS版本变化
+                    "uuid": "1737228844272158324158",  # 任意
+                    "screen": device["screen"],
 
-                 "canvas": self.canvas,
-                 "ai": self.ai,
-             },
-             extend
-            )
+                    "canvas": self.canvas,
+                    "ai": self.ai,
+                },
+                extend
+        )
 
     def redis_initial_account(self):
         # 检查账号是否存在
@@ -451,13 +452,13 @@ class MJDBase(object):
 
         json_data = {
             'version': '5.0',
-            'fp': self.fp,
-            'appId': self.ai,
+            'fp': 'cdxcxdwwpsr93dm1',
+            'appId': '8e94a',
             'timestamp': 1738830472155,
             'platform': 'web',
-            'expandParams': expand_params,
-            'fv': self.h5_version,
-            'localTk': "tk04wcbf1f6cc41lMngxKzF4MngzXRJNsIjNgRi9p8i814iBhIjBZZJZFvcC2Y8FppFGoc19mtVJdAHINADN0QGBmZGM",
+            'expandParams': 'WNpZcw5NsZ3L3tj83ZXRPp3RolTAm129mYi8iIT724SA2QXRfRX9zQXR5xZO3VTMgFTL3Z3L31DB3ZXRPpXNnZ3L3hjB2QXR5xZO3JGNoNDMmFjB2IWMgFWN3EmBmFGA1MDB0QDNp12MzEDL3Z3L3VW9TojA3Ej83ZXRPp3RlVGN2EmN0MjBlJGLkZ2BkNjNkFTA2UDA3UWNgB2A002R5x2RpAV_yQDAiQXR5xZO3BzBiV2MkVjNmNWApRzN38GN3A2B3U2N00GNoBjM3ATN3Z3L3Vm94Ay_4MzR5Z3XtR3A38GNjFGBmNmN1Y2BnRjMoRzM3QDNnFDLoV2AiRzApRXRfRn94Ay_4MzR5Z3XtRHPnN2Mi92Lkxm9vgHMrV2OpdkNjcE7l0z9kMDAmck9vc390gD-4Iy_qMzB08iOscjBr9D_w0C83Y2MmhHAyUz9qIi9qd3LmYS8l4TP5djAnInCrFV-1dURlUTR5ZXR3Z3L3RG83QXR5xZO3F2OphHMjcEAt0zA6EW-3Z3L3ByR5Z3XtR3R5x2RnEz90ADAnQXR5xZO3RjHp4GO-klJCQXRfRH_qIz_4QyR5Z3XtR3R5x2R0QyR5Z3XtF2NrVWRfR39pQXR5xZO3RmNr0jE3Z3L3BT93ZXRPp3RscjBrJz-rlzO08z944jB0QiOqxm9pIS8xQXRfRnAqQXR5xZO3VWMcFjBnEi_mAnNcFT9gIEA20z8nEj9zFmMmN2MhNWMh9WNmlWAQQCA1Qi_apD-4ICAVQCA1Qi_qlj_2gXAvgH_rFjAnUT-2Ez9qd3LmYS8l4zR5x2RtQC83ZXRPp3Mo5WRfRX-qQXR5xZOjNGMoZ3L39i_3ZXRPpXMj5WRfRX-3ZXRPp3MmFGN5x2RiQXR5xZO31nMfFmMkB2LmwzOoJDB28WLlZGOhETAr0jOmICAmMCBqJTMkRWL1QmO08z944jB0QiOl4S_1cH_qMzOykD-gEyBpBmNrFjA4Qi_lMiOqxm9pIS8x4XRu0VRlUTR5ZXRroEPkx2NgF2MfNy-rVWA4MjMhJWNs5CA1gD-qNS80Mi94cXAlF2NhJzNqFjAnUT-2Ez9qJS7tIjOscjBr9D_w0C83Y2MmhHAyUz9qIi9qd3LmYS8l4TP5tTE5JCB5ZXR5hTCwRGNf1GLkB2LmwzOoJDB28WLlZGOhETAr0jOmICAmMCBqJTMkRWL1QmO08z944jB0QiOl4S_1cH_qMzOykD-gEyBpBmNrFjA4Qi_lMiOqxm9pIS8x4XRuEURlUTR5ZXRroEPlV2LmJGLjxm9vgHN1UjBi5WMplX70Iz_wcn9lEj9mUjO1IGMn5WAndHAyQCBxMDAncX8hoTAqlj_2gnAs0D7kQTNjN2O08DBncT8mcnOfNS9lIS-xZn-DYX84YXR5Z3_90XNoxGLmR2LmwzOoJDB28WLlZGOhETAr0jOmICAmMCBqJTMkRWL1QmO08z944jB0QiOl4S_1cH_qMzOykD-gEyBpBmNrFjA4Qi_lMiOqxm9pIS8x4XRoJXE5JCB5ZXR5hTCkJ2LgRGNnV2LmwzOoJDB28WLlZGOhETAr0jOmICAmMCBqJTMkRWL1QmO08z944jB0QiOl4S_1cH_qMzOykD-gEyBpBmNrFjA4Qi_lMiOqxm9pIS8xYX84YXR5Z3_90nMnxWMhZ2Noxm9vgHN1UjBi5WMplX70Iz_wcn9lEj9mUjO1IGMn5WAndHAyQCBxMDAncX8hoTAqlj_2gnAs0D7kQTNjN2O08DBncT8mcnOfNS9lIS-xZXA4cT_0QS95JCB5ZXR5hTCwhm9kcD_ggj_rUTKxZX94kzOgUz9nUVRlUTR5ZXRroEMnxGLgZ2Noxm9vgHN1UjBi5WMplX70Iz_wcn9lEj9mUjO1IGMn5WAndHAyQCBxMDAncX8hoTAqlj_2gnAs0D7kQTNjN2O08DBncT8mcnOfNS9lIS-5JCB5ZXR5hTCwBWNn52Lkxm9vgHMrV2OpdkNjcE7l0z9kMDAmck9vc390gD-4Iy_qMzB08iOscjBr9D_w0C83Y2MmhHAyUz9qIi9qd3LmYS8l4TP5l09qIiB0oDAG0y90EC95NCB_Y38xInCrJy_0kD82cTINkVERYX84YXR5Z3_9Qy90YX8mET85x29qQy9UQXRfRHNkQzR5Z3XtR3R5x2RoZS93ZXRPpH65Z3XkZ3L3ZGNkQzR5ZXR5xZOpZ3L35G83QXR5ZXRPpXN5x2RiFyB3ZXR5Z3XtJWRfR3MkQzR5ZXR5xZOpZ3L3FG83QXR5ZXRPpXN5x2RlFyB3ZXR5Z3XtJGM5x2RmFyB3ZXR5Z3XtZWRfR3NkQzR5ZXR5xZO3F2OohXN3Z3L3VG83QXR5ZXRPpXN5x2Ru8yR5ZXR5xZOkZ3L3NS_3ZXR5Z3XtZWRfRX_3ZXR5Z3XtZWRfRXAiQXR5ZXRPtSRfRXArET8hEzR5Z3XtlSR5x5RmVGMo1G9xwyR5x2RoZyR5ZXR5xp75x2RpYyR5Z3XtRXMj5SReJ2Mr0jE5tWNrZGN5J0G5Ni8qIz_w80R5x2R4Ei93ZXRPp3RphXNrZ2OnNGNq9TAUY3MmhnMmFmOwQCBzUjF5Z2OphXNrRmNodHAscz9xMVRwdj-2EjI5Fj-woTRtpFGF4lHxZ3MmhnMmFmOl0jH3EjE0oT9pUVRwJ2MhYnLlB2_w8UReZ2OpVWRFgVRm8i_1gD-C4XRphHMqVT_t0z7qk1R5x2R4EyR5Z3XtRXNrZ2Oph3NmVmOyIDI5BmNr9mNkdH-nUzA4MURphXNrZ2OnNGNqFD_qQS-WYHPqsjB08VR0sD-tYXONkVERsVP5BmNr9mNkdX8ws1B08EAtYS9YYHPlBW75tWMjhD-CYnLphXNoZXELYn9icTAr0jExZXNrF2R5x2RjUzR5Z3XtFWRfRX_pQXR5xZOnZ3L3pD_3ZXRPp3RGEEOrETOX8FOrETOrETOLMFOxwyR5x2RmozR5Z3XtR3GWkX-fQXRfRX_3ZXRPpXN5x2R18yR5Z3XtZWRfRnBiQXR5xp7',
+            'fv': 'h5_file_v5.0.5',
+            'localTk': 'tk04wcbf1f6cc41lMngxKzF4MngzXRJNsIjNgRi9p8i814iBhIjBZZJZFvcC2Y8FppFGoc19mtVJdAHINADN0QGBmZGM',
         }
 
         response = self.get_response(url=url, json_data=json_data)
