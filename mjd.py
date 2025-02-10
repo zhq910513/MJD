@@ -178,6 +178,9 @@ class MJDOrder(MJDBase):
             log_error(f"获取初始化订单ID失败：{resp_json}")
             return self.return_info(code=3)
 
+        if not resp_json.get("errorCode") == "31":
+            return self.return_info(code=19)
+
         self.order_id = resp_json["result"]["orderId"]
         self.get_payinfo()
 
@@ -451,6 +454,10 @@ class MJDOrder(MJDBase):
 
         resp = self.get_response('https://api.m.jd.com/api', data=post_data)
         resp_json = resp.json()
+
+        if not resp_json.get("errorCode") == "31":
+            return self.return_info(code=19)
+
         if resp_json["code"] == "3":
             log_error(f"查询订单详情失败 账号不可用：{self.account['pt_pin']}")
             return self.return_info(code=0)
@@ -515,8 +522,8 @@ if __name__ == '__main__':
     # _order_id = "309056534641"   # dd
     # _order_id = "309488931894"   # 测试
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
-    pprint.pp(mo.run_create())
-    # mo.run_select()
+    # pprint.pp(mo.run_create())
+    mo.run_select()
     # pprint.pp(mo.get_payinfo())
     # pprint.pp(mo.get_wx_paylink())
     # mo.generate_device()

@@ -286,6 +286,7 @@ class MJDBase(object):
             16: "提取支付信息失败",
             17: "获取验证码信息失败",
             18: "获取微信支付链接失败",
+            19: "JS加密版本更新"
         }
         if not kwargs.get("error_msg"):
             error_msg = error_code_mapping.get(code, "未知错误代码")
