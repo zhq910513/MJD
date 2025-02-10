@@ -42,8 +42,7 @@
                     return 7
                 }
             }).a
-        }
-    ))
+        }))
         , v = s
         , d = o.exports.document
         , y = v(d) && v(d.createElement)

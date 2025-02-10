@@ -364,8 +364,12 @@ class MJDOrder(MJDBase):
         self.session.headers.update(headers)
 
         params = {
-            'prepay_id': self.wx_prepay_id,
-            'package': self.wx_package,
+            # 'prepay_id': "wx102344188722445e16a480bf2a89850001",
+            # 'package': "3232038231"
+            'prepay_id': "wx102345370275629f8115c84b109bd60001",
+            'package': "2155756182"
+            # 'prepay_id': self.wx_prepay_id,
+            # 'package': self.wx_package,
         }
         resp = self.get_response(url=url, params=params)
         resp_text = resp.text.replace('\n', '').replace('\t', '').replace('\r', '').replace(' ', '')
@@ -488,8 +492,8 @@ if __name__ == '__main__':
     _account = {
         # 自己的
         "pt_pin": "zhq91513",
-        "pt_key": "AAJnjAKLADAKXpZFQ2cmqFTN-XbDpDXuJzhfycVFhniv-UGwHhtR8dnOXpv4PVD4Q_iQBVG3bTo",
-        # "pt_key": "AAJnpCesADAxbvctVtaJQCr6aM0FUC1rYjxpt6aTC-5HxhmU4L7qKEg8_sK2ivOwbyXa69uQecs",   # edge
+        # "pt_key": "AAJnjAKLADAKXpZFQ2cmqFTN-XbDpDXuJzhfycVFhniv-UGwHhtR8dnOXpv4PVD4Q_iQBVG3bTo",
+        "pt_key": "AAJnpCesADAxbvctVtaJQCr6aM0FUC1rYjxpt6aTC-5HxhmU4L7qKEg8_sK2ivOwbyXa69uQecs",   # edge
         # dd
         # "pt_pin": "jd_LpHciKLtISJq",
         # "pt_key": "AAJnjpH2ADBFK9fUR_2ngUZBXT16TxqjqmLRBq3X7vNnil1BakPA3YosSI9e9ueGsqYPkFuH7VI",
@@ -499,16 +503,20 @@ if __name__ == '__main__':
         # "pt_pin": "jd_gAUwsCxtALiG",
         # "pt_key": "AAJniTWmADDf4Ar2uJqYIJfqWfwv6xzHI6mZSX-Fp3B1dsBsTwlSoRf49JBzaUFINvCeSRN9xI8",
         # 可用批量
-        # "pt_pin": "",
-        # "pt_key": "",
+        # "pt_pin": "jd_qUJbtnjwQSWs",
+        # "pt_key": "AAJnqIOxADBpd0N6wfgyDZG-YB7EENeOzKBu6zcY0WFZTIw02_2Q9XH_jKIjqbP5z27fsWlNI9w",
+        # "pt_pin": "jd_TjWNdaxBXkMw",
+        # "pt_key": "AAJnqIOxADBwwHNjWLxHiCnfwL4FR5C9z0AN6bi0ITiyIdQosATybvZoZ1qoYI0GMP-QvXX4vmI",
     }
     _sku_id = "10022039398507"
     # _order_id = "307843863375"
-    _order_id = "309443753492"
+    # _order_id = "309443753492"
+    _order_id = "310019811722"
     # _order_id = "309056534641"   # dd
+    # _order_id = "309488931894"   # 测试
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
-    # pprint.pp(mo.run_create())
-    pprint.pp(mo.run_select())
+    pprint.pp(mo.run_create())
+    # mo.run_select()
     # pprint.pp(mo.get_payinfo())
     # pprint.pp(mo.get_wx_paylink())
     # mo.generate_device()

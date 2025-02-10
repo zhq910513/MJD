@@ -60,10 +60,13 @@ class MJDBase(object):
 
         self.qq_game_des_key = "2E1ZMAF88CCE5EBE551FR3E9AA6FF322"  # 不变
         self.fp = "cdxcxdwwpsr93dm1"
+        self.wx_fp = "5931396482503861"
         self.ai = "8e94a"  # appId
+        self.wx_ai = ""
         self.canvas = "0fb7f119e21bb6b17b2b0d333a5617bf"
 
         self.h5st_modules = self.init_h5st_modules()
+        self.wx_h5st_modules = self.init_wx_h5st_modules()
         self.webglFp_modules = self.init_webglFp_modules()
         self.proxies = self.get_proxies()
         self.session = None
@@ -88,6 +91,13 @@ class MJDBase(object):
     def init_h5st_modules():
         # 读取本地 JavaScript 文件内容
         with open('h5st.js', 'r', encoding='utf-8') as file:
+            js_code = file.read()
+        return execjs.compile(js_code)
+
+    @staticmethod
+    def init_wx_h5st_modules():
+        # 读取本地 JavaScript 文件内容
+        with open('wx_h5st.js', 'r', encoding='utf-8') as file:
             js_code = file.read()
         return execjs.compile(js_code)
 
@@ -145,6 +155,9 @@ class MJDBase(object):
 
     def generate_h5st(self, device_info, func_api, input_clt_str, api_query_time, body_str):
         return self.h5st_modules.call("generate_h5st", device_info, func_api, input_clt_str, api_query_time, body_str)
+
+    def generate_wx_h5st(self):
+        return self.wx_h5st_modules.call("generate_wx_h5st", self.generate_wx_str())
 
     @staticmethod
     def device_list():
@@ -208,6 +221,7 @@ class MJDBase(object):
                     "deviceFp": device_fp,
                     "expandParams": expand_params,
                     "fp": self.fp,
+                    "wx_fp": self.wx_fp,
                     "tk": self.tk,
                     "rd": self.rd,
                     "eid": "AUPL37Q53QK76OL62SP75SPDVXTIU23DXBCZLBOAFVFW4UHD4QSM55A4VWMRBXEP7EY6SJBDYBILKDTR2GDKGIE3NI",
@@ -220,6 +234,7 @@ class MJDBase(object):
 
                     "canvas": self.canvas,
                     "ai": self.ai,
+                    "wx_ai": self.wx_ai,
                 },
                 extend
         )
@@ -298,6 +313,7 @@ class MJDBase(object):
             "card_account": kwargs.get("card_account", None),
             "card_password": kwargs.get("card_password", None),
         }
+        pprint.pp(self.result)
 
     def get_proxies(self):
         return None
@@ -377,6 +393,16 @@ class MJDBase(object):
             "fp": self.device_info["fp"]
         }
         return json.dumps(input_clt_dict, indent=2, ensure_ascii=False)
+
+    def generate_wx_str(self):
+        input_wx_dict = {
+            "sua": "Windows NT 10.0; Win64; x64",
+            "pp": {
+                "p1": self.account["pt_pin"]
+            },
+            "fp": "5931396482503861"
+        }
+        return json.dumps(input_wx_dict, indent=2, ensure_ascii=False)
 
     def generate_expand_params(self, device, device_fp, extend):
         # TODO bu1 有不同的情况
@@ -522,7 +548,9 @@ if __name__ == '__main__':
     }
     _order_id = "307843863375"
     mj = MJDBase(account=_account, order_id=_order_id)
-    print(mj.generate_tk_rd(
-        "eyJ0ayI6InRrMDN3YzJlNTFjYzkxOG5CejlOMlpNSnJzanpLWVEyS1RiOGZDTXVCc3JRZ1JtbWpxZ093Um9fek00NWhuU095aTJiVTQ2Wld3alFRZVNDV183TW82UktkdEhjIiwiYWxnbyI6ImZ1bmN0aW9uIHRlc3QodGssZnAsdHMsYWksYWxnbyl7dmFyIHJkPSd1QmFXTzEwV0RuVWUnO3ZhciBzdHI9XCJcIi5jb25jYXQodGspLmNvbmNhdChmcCkuY29uY2F0KHRzKS5jb25jYXQoYWkpLmNvbmNhdChyZCk7cmV0dXJuIGFsZ28uTUQ1KHN0cik7fSJ9"))
+    # print(mj.generate_tk_rd(
+    #     "eyJ0ayI6InRrMDN3YzJlNTFjYzkxOG5CejlOMlpNSnJzanpLWVEyS1RiOGZDTXVCc3JRZ1JtbWpxZ093Um9fek00NWhuU095aTJiVTQ2Wld3alFRZVNDV183TW82UktkdEhjIiwiYWxnbyI6ImZ1bmN0aW9uIHRlc3QodGssZnAsdHMsYWksYWxnbyl7dmFyIHJkPSd1QmFXTzEwV0RuVWUnO3ZhciBzdHI9XCJcIi5jb25jYXQodGspLmNvbmNhdChmcCkuY29uY2F0KHRzKS5jb25jYXQoYWkpLmNvbmNhdChyZCk7cmV0dXJuIGFsZ28uTUQ1KHN0cik7fSJ9"))
     # device = random.choice(mj.device_list())
     # mj.generate_device()
+    print(mj.generate_wx_h5st())
+
