@@ -13,7 +13,7 @@ from plugins.log import log_error
 
 
 class MJDOrder(MJDBase):
-    def __init__(self, account, sku_id, order_id=None, *args, **kwargs):
+    def __init__(self, account, sku_id, order_id=None):
         super().__init__(account=account, order_id=order_id)
         self.get_account_setting()
         self.sku_id = sku_id
@@ -255,15 +255,13 @@ class MJDOrder(MJDBase):
             self.wx_appid, self.wx_payid = matchs.group(1), matchs.group(2)
 
             # 获取支付链接
-            self.get_wx_payid()
-            # return self.return_info(code=1, payment_link=result_data)
+            self.get_client_action()
         else:
             log_error(f"提取支付信息失败：{resp_json}")
             return self.return_info(code=16)
 
     # 获取支付链接
-    def get_wx_payid(self):
-        print("platWapWXPay")
+    def get_client_action(self):
         url = "https://api.m.jd.com/client.action"
         func_api = "platWapWXPay"
 
@@ -338,23 +336,25 @@ class MJDOrder(MJDBase):
             log_error(f"微信支付参数缺失：{resp_json}")
             return self.return_info(code=15)
 
-        # 获取验证码
-        # self.get_cap_union()
+        # 获取微信支付链接
+        # self.get_wx_paylink()
 
-    # 获取验证码信息
-    def get_cap_union(self):
-        url = "https://t.captcha.qq.com/cap_union_prehandle"
+    # 获取微信支付链接
+    def get_wx_paylink(self):
+        url = "https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkmweb"
 
         headers = {
-            'Accept': '*/*',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7',
             'Cache-Control': 'no-cache',
             'Connection': 'keep-alive',
             'Pragma': 'no-cache',
-            'Referer': 'https://wx.tenpay.com/',
-            'Sec-Fetch-Dest': 'script',
-            'Sec-Fetch-Mode': 'no-cors',
+            'Referer': 'https://mpay.m.jd.com/',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
             'Sec-Fetch-Site': 'cross-site',
+            'Sec-Fetch-User': '?1',
+            'Upgrade-Insecure-Requests': '1',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36',
             'sec-ch-ua': '"Not A(Brand";v="8", "Chromium";v="132", "Google Chrome";v="132"',
             'sec-ch-ua-mobile': '?0',
@@ -364,39 +364,23 @@ class MJDOrder(MJDBase):
         self.session.headers.update(headers)
 
         params = {
-            'aid': '2093769752',
-            'protocol': 'https',
-            'accver': '1',
-            'showtype': 'embed',
-            'ua': 'TW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEzMi4wLjAuMCBTYWZhcmkvNTM3LjM2',
-            'noheader': '1',
-            'fb': '0',
-            'aged': '0',
-            'enableAged': '0',
-            'enableDarkMode': 'force',
-            'grayscale': '1',
-            'dyeid': '0',
-            'clientype': '2',
-            'cap_cd': '',
-            'uid': '',
-            'lang': 'zh-cn',
-            'entry_url': 'https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkmweb',
-            'elder_captcha': '0',
-            'js': '/tcaptcha-frame.70f42bb2.js',
-            'login_appid': '',
-            'wb': '1',
-            'version': '1.1.0',
-            'subsid': '1',
-            'callback': '',
-            'sess': '',
+            'prepay_id': self.wx_prepay_id,
+            'package': self.wx_package,
         }
         resp = self.get_response(url=url, params=params)
-        resp_json = json.loads(re.match(r"\((.*?)\)", resp.text).group(1))
-        if not resp_json:
-            log_error(f"获取验证码信息失败：{resp_json}")
-            return self.return_info(code=17)
+        resp_text = resp.text.replace('\n', '').replace('\t', '').replace('\r', '').replace(' ', '')
+        if not resp_text:
+            log_error(f"获取微信支付链接失败：{resp_text}")
+            return self.return_info(code=18)
+        else:
+            for payment_link in re.findall('deeplink:"(.*?)"', resp_text):
+                if payment_link and "weixin://wap/pay?" in payment_link:
+                    return self.return_info(code=1, payment_link=payment_link)
 
-        self.sess = resp_json["sess"]
+            for error_msg in re.findall('error_msg:"(.*?)"', resp_text):
+                if error_msg:
+                    log_error(f"获取微信支付链接失败：{error_msg}")
+                    return self.return_info(code=18, error_msg=error_msg)
 
     # 查询
     def get_order_detail(self):
@@ -515,6 +499,8 @@ if __name__ == '__main__':
         # "pt_pin": "jd_gAUwsCxtALiG",
         # "pt_key": "AAJniTWmADDf4Ar2uJqYIJfqWfwv6xzHI6mZSX-Fp3B1dsBsTwlSoRf49JBzaUFINvCeSRN9xI8",
         # 可用批量
+        # "pt_pin": "",
+        # "pt_key": "",
     }
     _sku_id = "10022039398507"
     # _order_id = "307843863375"
@@ -522,7 +508,7 @@ if __name__ == '__main__':
     # _order_id = "309056534641"   # dd
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
     # pprint.pp(mo.run_create())
-    # pprint.pp(mo.run_select())
-    pprint.pp(mo.get_payinfo())
-    # pprint.pp(mo.get_cap_union())
+    pprint.pp(mo.run_select())
+    # pprint.pp(mo.get_payinfo())
+    # pprint.pp(mo.get_wx_paylink())
     # mo.generate_device()

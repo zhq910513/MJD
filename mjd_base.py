@@ -3,6 +3,7 @@
 import base64
 import hashlib
 import json
+import pprint
 import random
 import re
 import time
@@ -233,7 +234,7 @@ class MJDBase(object):
                 "device_info": self.device_info,
                 "extend_info": self.extend_info,
             }
-            self.redis.set(self.redis_key, json.dumps(initial_data))
+            self.redis.set(self.redis_key, json.dumps(initial_data), ex=60 * 60 * 24 * 1)
         else:
             print("检查账号已经存在")
             account_cache = json.loads(self.redis.get(self.redis_key))
@@ -269,8 +270,12 @@ class MJDBase(object):
             15: "微信支付参数缺失",
             16: "提取支付信息失败",
             17: "获取验证码信息失败",
-
+            18: "获取微信支付链接失败",
         }
+        if not kwargs.get("error_msg"):
+            error_msg = error_code_mapping.get(code, "未知错误代码")
+        else:
+            error_msg = kwargs.get("error_msg")
 
         # 确保 code 是整数，避免因字符串 key 导致的 KeyError
         code = int(code)
@@ -284,7 +289,7 @@ class MJDBase(object):
         # 组装返回结果
         self.result = {
             "code": code,
-            "msg": error_code_mapping.get(code, "未知错误代码"),  # 增加默认错误信息，避免未定义的 code 抛出 KeyError
+            "msg": error_msg,  # 增加默认错误信息，避免未定义的 code 抛出 KeyError
             "sku_id": getattr(self, "sku_id", None),  # 使用 getattr 避免属性不存在时抛出异常
             "order_id": getattr(self, "order_id", None),
             "payment_link": kwargs.get("payment_link", None),

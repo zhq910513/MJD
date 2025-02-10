@@ -1,6 +1,6 @@
 // 引入模型文件
 const MJDModule = require('./mjd_modules_v5_20250131');
-console.log(MJDModule);
+// console.log(MJDModule);
 
 // 外部函数
 function format_timestamp(api_query_time) {
