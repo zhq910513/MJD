@@ -8,6 +8,7 @@ function _0x35fb(e, t) {
     )(e, t)
 }
 
+// 需要注意定住列表值，获取当前位置的列表
 function _0x1f7d() {
     return [
         "3AB9D23F7A4B3CSS",
@@ -590,7 +591,6 @@ function _0x1f7d() {
     ];
 }
 
-
 var jdtRiskEncryptUtil = (e => {
     var u, p = _0x3f5411;
 
@@ -849,6 +849,7 @@ var jdtRiskEncryptUtil = (e => {
 })(jdtRiskEncryptUtil || {});
 
 
-function generate_webglFp(r) {
+// 源码位置：p = jdtRiskEncryptUtil[t(699)][t(578)](r.join(t(577)), 31),
+function generate_FFA9D23F7A4B3CSS(r) {
     return jdtRiskEncryptUtil['HASH']['hash128'](r.join('~~~'), 31);
 }

@@ -178,7 +178,7 @@ class MJDOrder(MJDBase):
             log_error(f"获取初始化订单ID失败：{resp_json}")
             return self.return_info(code=3)
 
-        if not resp_json.get("errorCode") == "31":
+        if resp_json.get("errorCode") == "31":
             return self.return_info(code=19)
 
         self.order_id = resp_json["result"]["orderId"]
@@ -247,7 +247,7 @@ class MJDOrder(MJDBase):
 
         resp = self.get_response('https://api.m.jd.com/api', params=params)
         resp_json = resp.json()
-        pprint.pp(resp_json)
+
         if resp_json["msg"] != "成功":
             log_error(f"获取支付信息失败：{resp_json}")
             return self.return_info(code=4)
@@ -314,9 +314,9 @@ class MJDOrder(MJDBase):
         input_clt_str = self.generate_clt_str()
 
         # 签名
+        '20250211192455228;4555450126978885;303a7;tk03wbd811c7d18nKPArsuvQ4Ila__kMi5OG7Uz-y8wMXSIZvnXaf7MvbnI-280nZuUK8gBijVuulzIzVAb7cZJWNbC-;8a47e4236f0edd96e7012c44b819a180b7ff8cc438854d888648b2c7c883b74f;3.1;1739273095228;24c9ee85e67cf80746dd82817ecbeafc7a829b35c7f446a4c7d476cc9faa1d8834a93323ad7bce9bef1bba682b93d2e3fd2f0ccc417e4cc7c023fe82837aea5b156a49d62104be664a06bb4c6c4780dfd015248b474fd654db499620397e049ff4cced7265b0a02b8c997a3920d164f7'
         h5st = self.generate_h5st(device_info=self.device_info, func_api=func_api, input_clt_str=input_clt_str,
                                   api_query_time=api_query_time, body_str=body_str)
-        print(h5st)
         data = {
             'body': json.dumps(body, separators=(',', ':')),
             'x-api-eid-token': self.device_info["eid_token"],
@@ -341,6 +341,7 @@ class MJDOrder(MJDBase):
 
         # 获取微信支付链接
         # self.get_wx_paylink()
+
 
     # 获取微信支付链接
     def get_wx_paylink(self):
@@ -369,8 +370,8 @@ class MJDOrder(MJDBase):
         params = {
             # 'prepay_id': "wx102344188722445e16a480bf2a89850001",
             # 'package': "3232038231"
-            'prepay_id': "wx102345370275629f8115c84b109bd60001",
-            'package': "2155756182"
+            'prepay_id': "wx1119245569069109d292036661f16f0000",
+            'package': "1720982631"
             # 'prepay_id': self.wx_prepay_id,
             # 'package': self.wx_package,
         }
@@ -444,8 +445,7 @@ class MJDOrder(MJDBase):
         input_clt_str = self.generate_clt_str()
 
         # 签名
-        h5st = self.generate_h5st(device_info=self.device_info, func_api=func_api, input_clt_str=input_clt_str,
-                                  api_query_time=api_query_time, body_str=body_str)
+        h5st = self.generate_h5st(device_info=self.device_info, func_api=func_api, input_clt_str=input_clt_str, api_query_time=api_query_time, body_str=body_str)
 
         post_data.update({
             'h5st': h5st
@@ -455,7 +455,7 @@ class MJDOrder(MJDBase):
         resp = self.get_response('https://api.m.jd.com/api', data=post_data)
         resp_json = resp.json()
 
-        if not resp_json.get("errorCode") == "31":
+        if resp_json.get("errorCode") == "31":
             return self.return_info(code=19)
 
         if resp_json["code"] == "3":
@@ -499,8 +499,8 @@ if __name__ == '__main__':
     _account = {
         # 自己的
         "pt_pin": "zhq91513",
-        # "pt_key": "AAJnjAKLADAKXpZFQ2cmqFTN-XbDpDXuJzhfycVFhniv-UGwHhtR8dnOXpv4PVD4Q_iQBVG3bTo",
-        "pt_key": "AAJnpCesADAxbvctVtaJQCr6aM0FUC1rYjxpt6aTC-5HxhmU4L7qKEg8_sK2ivOwbyXa69uQecs",   # edge
+        "pt_key": "AAJnjAKLADAKXpZFQ2cmqFTN-XbDpDXuJzhfycVFhniv-UGwHhtR8dnOXpv4PVD4Q_iQBVG3bTo",
+        # "pt_key": "AAJnpCesADAxbvctVtaJQCr6aM0FUC1rYjxpt6aTC-5HxhmU4L7qKEg8_sK2ivOwbyXa69uQecs",   # edge
         # dd
         # "pt_pin": "jd_LpHciKLtISJq",
         # "pt_key": "AAJnjpH2ADBFK9fUR_2ngUZBXT16TxqjqmLRBq3X7vNnil1BakPA3YosSI9e9ueGsqYPkFuH7VI",
@@ -516,14 +516,14 @@ if __name__ == '__main__':
         # "pt_key": "AAJnqIOxADBwwHNjWLxHiCnfwL4FR5C9z0AN6bi0ITiyIdQosATybvZoZ1qoYI0GMP-QvXX4vmI",
     }
     _sku_id = "10022039398507"
-    # _order_id = "307843863375"
+    _order_id = "307843863375"
     # _order_id = "309443753492"
-    _order_id = "310019811722"
+    # _order_id = "310019811722"
     # _order_id = "309056534641"   # dd
     # _order_id = "309488931894"   # 测试
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
     # pprint.pp(mo.run_create())
-    mo.run_select()
+    # mo.run_select()
     # pprint.pp(mo.get_payinfo())
-    # pprint.pp(mo.get_wx_paylink())
+    pprint.pp(mo.get_wx_paylink())
     # mo.generate_device()

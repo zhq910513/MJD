@@ -13,7 +13,7 @@
 // console.log(t);
 
 // 引入模型文件
-const MJDModule = require('./mjd_wx_modules_v5_20250131');
+const MJDModule = require('./wx_modules_20250131');
 // console.log(MJDModule);
 
 function generate_wx_h5st(input_str) {
