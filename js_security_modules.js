@@ -92,7 +92,8 @@ function generate_webglFp(input_webglFp_str) {
 
 
 // // // 每次源码迭代需要打开测试是否缺参
-// const encrypt_time = 1739263353582;
+// const encrypt_time = 1739285490218;
+// console.log(format_timestamp(encrypt_time));
 // const fp = "r3dap9xcr33rrr86";
 // const ai = "8e94a";
 // const tk = "tk03wa0761c8318nLNy015znpr5ZKG8gcK4yCuGn3IcLxgt-chJ6E8qZnOdYVBZWju00g3Hbz3ghnsmYXmQHNo3mqrS_";
@@ -137,3 +138,4 @@ function generate_webglFp(input_webglFp_str) {
 
 // const _wq_dy1_tk_algo = "eyJ0ayI6InRrMDN3OTI2MDFjODYxOG5WcEtWWlQxWkM2QXNROGxyR05aTWwxMVQxd0xsX2dxVnRKQkFIWXhQNGcyLWFVd24tbXJyNlZNVWZmTlNKT2tXVlBvakhwaWVyd2NyIiwiYWxnbyI6ImZ1bmN0aW9uIHRlc3QodGssZnAsdHMsYWksYWxnbyl7dmFyIHJkPSdjNmtwWlpGQ3VBMTEnO3ZhciBzdHI9XCJcIi5jb25jYXQodGspLmNvbmNhdChmcCkuY29uY2F0KHRzKS5jb25jYXQoYWkpLmNvbmNhdChyZCk7cmV0dXJuIGFsZ28uTUQ1KHN0cik7fSJ9";
 // console.log(get_tk_rd(_wq_dy1_tk_algo));
+
