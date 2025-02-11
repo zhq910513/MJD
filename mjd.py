@@ -225,6 +225,7 @@ class MJDOrder(MJDBase):
             "version": self.body_info["version"],
             "orderSource": self.body_info["orderSource"],
         }
+        pprint.pp(body)
         body_str = self.generate_body_str(body)
 
         # 设备指纹信息
@@ -247,6 +248,7 @@ class MJDOrder(MJDBase):
         params.update({
             'h5st': h5st
         })
+        pprint.pp(params)
 
         resp = self.get_response('https://api.m.jd.com/api', params=params)
         resp_json = resp.json()
@@ -306,6 +308,7 @@ class MJDOrder(MJDBase):
             "origin": "h5",
             "mcashierTraceId": api_query_time,
         }
+        body_str = self.generate_body_str(body)
 
         params = {
             'functionId': func_api,
@@ -314,7 +317,8 @@ class MJDOrder(MJDBase):
         }
 
         # 签名
-        h5st = self.generate_wx_h5st(api_query_time=api_query_time)
+        h5st = self.generate_wx_h5st(api_query_time=api_query_time, body_str=body_str)
+
         data = {
             'body': json.dumps(body, separators=(',', ':')),
             'x-api-eid-token': self.device_info["eid_token"],
@@ -323,6 +327,7 @@ class MJDOrder(MJDBase):
 
         resp = self.get_response(url=url, params=params, data=data)
         resp_json = resp.json()
+        pprint.pprint(resp_json)
 
         if not resp_json.get("payInfo"):
             log_error(f"获取微信支付信息失败：{resp_json}")
@@ -508,14 +513,15 @@ if __name__ == '__main__':
     }
     _sku_id = "10022039398507"
     # _order_id = "307843863375"
-    _order_id = "310083340615"
+    _order_id = "309531051382"
     # _order_id = "309488931894"   # 测试
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
     # mo.run_create()
     # mo.run_select()
-    mo.get_sku_info()
+    # mo.get_sku_info()
     # mo.get_init_order()
-    # mo.get_payinfo()
+    mo.get_payinfo()
     # mo.get_client_action()
     # mo.get_wx_paylink()
     # mo.generate_device()
+    # print(mo.generate_wx_h5st(int(time.time() * 1000)))

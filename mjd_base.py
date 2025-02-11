@@ -61,9 +61,9 @@ class MJDBase(object):
 
         self.qq_game_des_key = "2E1ZMAF88CCE5EBE551FR3E9AA6FF322"  # 不变
         self.fp = "r3dap9xcr33rrr86"
-        self.wx_fp = "5931396482503861"
+        self.wx_fp = "5709503734621005"
         self.ai = "8e94a"  # appId
-        self.wx_ai = ""
+        self.wx_ai = "303a7"
         self.canvas = "0fb7f119e21bb6b17b2b0d333a5617bf"
 
         self.js_security_modules = self.init_js_security_modules()
@@ -273,8 +273,13 @@ class MJDBase(object):
                     "expandParams": expand_params,
                     "fp": self.fp,
                     "wx_fp": self.wx_fp,
+
                     "tk": self.tk,
                     "rd": self.rd,
+
+                    "wx_tk": "tk03wc8711d0118nzEHNiry90w1MqMEI3gTCmzmIU7otXtAZjcebYH3cHaloxciaL9sWBbZFVmUzi6ZhlLmFq7eSjf31",
+                    "wx_rd": "XlvJ1LervnKV",
+
                     "eid": "N5ENAHSQJ4LCSHAZU6V4ONIBT7H5OWJ7QAT5JANZPLGQUUA2LQVA73SQCFPSMNNODES5ENJECTHFIXO6QZSEYYQTCQ",
                     "eid_token": "jdd03N5ENAHSQJ4LCSHAZU6V4ONIBT7H5OWJ7QAT5JANZPLGQUUA2LQVA73SQCFPSMNNODES5ENJECTHFIXO6QZSEYYQTCQAAAAMU6WTYHXAAAAAADSX3HOXNL2IKSUX",
                     "time_range": "22",  # js版本固定值,跟随版本变化
@@ -448,9 +453,15 @@ class MJDBase(object):
         clt_str = self.generate_clt_str()
         return self.js_security_modules.call("generate_clt", clt_str)
 
-    def generate_wx_u(self, ts):
-        u_str = f"{self.device_info['tk']}{self.wx_fp}{ts}{self.wx_ai}{self.device_info['rd']}"
-        return self.wx_h5st_modules.call("generate_wx_u", u_str, self.device_info['tk'])
+    def generate_wx_u(self, ts, body_str):
+        # 有两次加密
+        # 定位点
+        # 使用下面方法把u再次加密 二次加密入口：var O = this[d(0, 1005, 1124)](u, e);
+        # 实现位置：a = Gh["HmacSHA256"](c, n)["toString"](Gh.enc["Hex"]);
+        # 参数c "appid:mcashier&body:{body_str}&functionId:platPayChannel"
+        # 参数n u_str加密的值
+        u_str = f"{self.device_info['wx_tk']}{self.wx_fp}{ts}{self.wx_ai}{self.device_info['wx_rd']}"
+        return self.wx_h5st_modules.call("generate_wx_u", u_str, self.device_info['wx_tk'], body_str)
 
     def generate_wx_o(self):
         wx_dict = {
@@ -463,19 +474,20 @@ class MJDBase(object):
         wx_o_str = json.dumps(wx_dict, indent=2, ensure_ascii=False)
         return self.wx_h5st_modules.call("generate_wx_o", wx_o_str)
 
-    def generate_wx_h5st(self, api_query_time):
+    def generate_wx_h5st(self, api_query_time, body_str):
         # 先定位参数：x-api-eid-token
         # 定位点：P.sign(N) (在第一步上面几行代码)
         # 再逐步进入 Ho(i, r, o, u, c, "next", t)
-        # h5st定位点  return regeneratorRuntime.wrap   下的   case 8:中
+        # h5st方法定位点  return regeneratorRuntime.wrap   下的   case 8:中 i = this[c(0, 1467, 0, 1719)](r, o)
+
         ts = self.js_security_modules.call("format_timestamp", api_query_time)
-        u = self.generate_wx_u(ts)
+        u = self.generate_wx_u(ts, body_str)
         o = self.generate_wx_o()
         return ";".join([
             ts,
-            self.wx_fp,
-            self.wx_ai,
-            self.device_info["tk"],
+            self.device_info["wx_fp"],
+            self.device_info["wx_ai"],
+            self.device_info["wx_tk"],
             u,
             "3.1",
             str(api_query_time),
@@ -626,8 +638,8 @@ if __name__ == '__main__':
     }
     _order_id = "307843863375"
     mj = MJDBase(account=_account, order_id=_order_id)
-    # print(mj.generate_tk_rd(
-    #     "eyJ0ayI6InRrMDN3YTA3NjFjODMxOG5MTnkwMTV6bnByNVpLRzhnY0s0eUN1R24zSWNMeGd0LWNoSjZFOHFabk9kWVZCWldqdTAwZzNIYnozZ2huc21ZWG1RSE5vM21xclNfIiwiYWxnbyI6ImZ1bmN0aW9uIHRlc3QodGssZnAsdHMsYWksYWxnbyl7dmFyIHJkPSdRS0hCVGhVNm5zcWknO3ZhciBzdHI9XCJcIi5jb25jYXQodGspLmNvbmNhdChmcCkuY29uY2F0KHRzKS5jb25jYXQoYWkpLmNvbmNhdChyZCk7cmV0dXJuIGFsZ28uTUQ1KHN0cik7fSJ9"))
+    print(mj.generate_tk_rd(
+        "ZnVuY3Rpb24gdGVzdCh0ayxmcCx0cyxhaSxhbGdvKXt2YXIgcmQ9J1hsdkoxTGVydm5LVic7dmFyIHN0cj0iIi5jb25jYXQodGspLmNvbmNhdChmcCkuY29uY2F0KHRzKS5jb25jYXQoYWkpLmNvbmNhdChyZCk7cmV0dXJuIGFsZ28uU0hBNTEyKHN0cik7fQ="))
     # device = random.choice(mj.device_list())
     # mj.generate_device()
     # print(mj.generate_wx_h5st())
