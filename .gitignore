@@ -4,7 +4,6 @@ venv/
 *.so
 .idea/
 .vscode/
-*.png
 *.jpg
 *.xmind
 *.log
