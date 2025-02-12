@@ -35,8 +35,8 @@ function format_timestamp(api_query_time) {
     return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}`;
 }
 
-function generate_wx_u1(u_1_str) {
-    const u_1_words = MJDModule.SHA512(u_1_str);
+function generate_wx_u1(u_1_str, tk) {
+    const u_1_words = MJDModule.HmacSHA256(u_1_str, tk);
     return u_1_words.toString();
 }
 
@@ -47,10 +47,8 @@ function generate_wx_u2(body_str, u_1) {
 }
 
 function generate_wx_u(u_1_str, tk, body_str) {
-    const u_1 = generate_wx_u1(u_1_str);
-
-    const u_2_str = `appid:mcashier&body:${body_str}&functionId:platPayChannel`;
-    const u_2_words = MJDModule.HmacSHA256(u_2_str, u_1);
+    const u_1 = generate_wx_u1(u_1_str, tk);
+    const u_2_words = generate_wx_u2(body_str, u_1);
     return u_2_words.toString(MJDModule.enc.Hex);
 }
 
@@ -67,55 +65,44 @@ function generate_wx_o(o_str) {
     return encrypted_str.ciphertext.toString();
 }
 
-function h5st(api_query_time) {
+function h5st(api_query_time, u_1_str, tk, body_str, fp, ai, o) {
     const ts = format_timestamp(api_query_time);
-    // "appid:mcashier&body:08ce40492d04da2ab9c8d90388216d9fe59fa5b27eb7f209eb4c63e102724d1f&functionId:platPayChannel"
-    const body_str = "08ce40492d04da2ab9c8d90388216d9fe59fa5b27eb7f209eb4c63e102724d1f";
-    const func_str = `appid:mcashier&body:${body_str}&functionId:platPayChannel`
-    const u_2_words = MJDModule.HmacSHA256(func_str, u_1);
-    const u = u_2_words.toString(MJDModule.enc.Hex);
+    const u = generate_wx_u(u_1_str, tk, body_str);
     return [
         ts,
-        "3606331785990409",
-        "303a7",
-        "tk03wc2e41cdf18n3Xw4nbiSLojdUyR8b6GBtsW42WjlibMGtDhoISkmjXE_uCzLNP0KY35xSlk7EreUvOlkPXjT4s1u",
+        fp,
+        ai,
+        tk,
         u,
         "3.1",
         api_query_time,
-        "24c9ee85e67cf80746dd82817ecbeafc7a829b35c7f446a4c7d476cc9faa1d8834a93323ad7bce9bef1bba682b93d2e3fd2f0ccc417e4cc7c023fe82837aea5b156a49d62104be664a06bb4c6c4780df3d2a5f6549b4854bd6c1e8342fa8be7958aee95d9dbadef944c9a1ba6826c8b0"
+        o
     ].join(";")
 }
 
-// // 示例调用
-// // 24c9ee85e67cf80746dd82817ecbeafc7a829b35c7f446a4c7d476cc9faa1d8834a93323ad7bce9bef1bba682b93d2e3fd2f0ccc417e4cc7c023fe82837aea5b156a49d62104be664a06bb4c6c4780df3d2a5f6549b4854bd6c1e8342fa8be7958aee95d9dbadef944c9a1ba6826c8b0
-// const o_str = JSON.stringify({"sua": "Windows NT 10.0; Win64; x64", "pp": {"p1": "zhq91513"}, "fp": "3606331785990409"}, null, 2);
-// const o = generate_wx_o(o_str);
-// console.log("o: ", o);
-//
-// const api_query_time = 1739343914747;
-// const tk = "tk03wc2e41cdf18n3Xw4nbiSLojdUyR8b6GBtsW42WjlibMGtDhoISkmjXE_uCzLNP0KY35xSlk7EreUvOlkPXjT4s1u";
-// const fp = "3606331785990409";
-// const ts = format_timestamp(api_query_time);
-// const ai = "303a7";
-// const rd = "01KedVEPCUiE";
-// const u_1_str = "".concat(tk).concat(fp).concat(ts).concat(ai).concat(rd);
-// const u_1 = generate_wx_u1(u_1_str);
-// console.log("u_1: ", u_1);
-//
-// const body_str = "59aa0f087fd7a53ac105ec079e356e42975b99678cdbf0a9fb7deaa93254d7dc";
-// const u_2_str = `appid:mcashier&body:${body_str}&functionId:platPayChannel`;
-// const u_2 = generate_wx_u2(u_2_str, u_1)
-// console.log("u_2: ", u_2);
-//
-// const _h5st = [
-//         ts,
-//         fp,
-//         ai,
-//         tk,
-//         u_2,
-//         "3.1",
-//         api_query_time,
-//         o
-//     ].join(";")
-// console.log("h5st: ", _h5st);
+// 示例调用
+const api_query_time = 1739377900099;
+const tk = "tk03wa66f1c0218nY5jEJUxn2QpKvcj_gTEjrad0h_9o5RT-K6SKU1NCSQf0gaEyUsl2pQUQlFWtdGUcbZOC0hD1Oejk";
+const fp = "0109734912890628";
+const ts = format_timestamp(api_query_time);
+const ai = "303a7";
+const rd = "0bHJG8t6dd6S";
+
+const o_str = JSON.stringify({"sua": "Windows NT 10.0; Win64; x64", "pp": {"p1": "zhq91513"}, "fp": fp}, null, 2);
+const o = generate_wx_o(o_str);
+console.log("o: ", o);
+
+const u_1_str = "".concat(tk).concat(fp).concat(ts).concat(ai).concat(rd);
+const u_1 = generate_wx_u1(u_1_str, tk);
+console.log("u_1: ", u_1);
+
+const body_str = "51459acc2c12f75c0c43871cb06f4009f9e5e20aab68e9eb92e22fd3d04539dd";
+const u_2 = generate_wx_u2(body_str, u_1)
+console.log("u_2: ", u_2);
+
+const u = generate_wx_u(u_1_str, tk, body_str);
+console.log("u: ", u);
+
+const _h5st = h5st(api_query_time, u_1_str, tk, body_str, fp, ai, o)
+console.log("h5st: ", _h5st);
 
