@@ -60,9 +60,9 @@ class MJDBase(object):
         self.h5_version = "h5_file_v5.0.6"  # 每次10天左右会变化版本，modules源码也会跟着变
 
         self.qq_game_des_key = "2E1ZMAF88CCE5EBE551FR3E9AA6FF322"  # 不变
-        self.fp = "r3dap9xcr33rrr86"
-        self.wx_fp = "5709503734621005"
-        self.ai = "8e94a"  # appId
+        self.fp = "wdpspwpd3racxs31"
+        self.wx_fp = "3606331785990409"
+        self.ai = "8e94a"
         self.wx_ai = "303a7"
         self.canvas = "0fb7f119e21bb6b17b2b0d333a5617bf"
 
@@ -74,6 +74,8 @@ class MJDBase(object):
         self.result = None
         self.tk = None
         self.rd = None
+        self.wx_tk = None
+        self.wx_rd = None
         self.device_info = None
         self.body_info = {
             "version": "1.10",
@@ -108,56 +110,6 @@ class MJDBase(object):
         with open('m_tk_20250131.js', 'r', encoding='utf-8') as file:
             js_code = file.read()
         return execjs.compile(js_code)
-
-    @staticmethod
-    def generate_webglFp(device):
-        # webgl_3d 变化而来
-        # 定位点：_$T4.format(_$T2(_$lw.fofLr.concat(_$lv.join('\xa7'))))
-        # 需要插桩监控 localStorge WQ_gather_wgl1
-        fp_list = [
-            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAACWCAYAAABkW7XSAAAAAXNSR0IArs4c6QAADPtJREFUeF7tnV2IJUcVx0/fmUEkiIKIBgm6oIR9iJ9EhDzYI+QhKCgEUUEfgoKC5iGgKCjMveqDiERQUCGCPqiIgoqIioIzKn7AamaZWXZgZslsMjquiRjNxl3Mxmm37ofTc+d+9L23u+qcqt+8Tt+uc/7/w4+q01XdmfCHAiiAAkYUyIzESZgogAIoIACLIkABFDCjAMAyYxWBogAKACxqAAVQwIwCAMuMVQSKAigAsKgBFEABMwoALDNWESgKoADAogZQAAXMKACwzFhFoCiAAgCLGkABFDCjAMAyYxWBogAKACxqAAVQwIwCAMuMVQSKAigAsKgBFEABMwoALDNWESgKoADAogZQAAXMKACwzFhFoCiAAgCLGkABFDCjAMAyYxWBogAKACxqoHYFbhSSL4vkWSbt2m/ODZNWAGAlbX8zyfeBtS4iq1kmG82Mwl1TVABgpeh6wzkfFbKeieRumCzjuwENy53U7QFWUnb7SbYMrJvM6rA09KN7CqMArBRc9pzjUSHFUGEBLc8exDocwIrV2UB5uf7VknSXhMN/QCuQJzENC7BiclNBLs8Wst5yTwhHx0ITXoFHlkMAWJbdUxj7FGDRhFfomaWQAJYltwzE+mwhRcs9HRwf60aWyaqBVAhRoQIAS6EpVkNy/atMukvCaXsZ6GdZNTlw3AArsAExDX+jv/+qArBc2kArJvM95QKwPAmdwjAzAstJQhM+hcKoMUeAVaOYqd/qRn//VcUZVlcudsKnXjWz5Q+wZtOLq8cocL134Lm7/2oWYIkITXiqqrICAKuyVFw4SYHrhbSXRdbmABb9LEqrsgIAq7JUXDhJgWf6Dfc5gQW0KK9KCgCsSjJx0TQF/lPafzXjkrB8a54cThM68f8DrMQLoI70Xf+qVdp/tQCwaMLXYUjE9wBYEZvrK7V/9/tXA1AtAiya8L5cszkOwLLpm6qor/cPPNcELPpZqtzVFQzA0uWHyWiu9/tXNQILaJmshOaDBljNaxz1CFf7+68crGoGFtCKunLmSw5gzacbv+or4PpXLZG1hoBFE55KO6EAwKIgFlLgWunAcwMzLBcbO+EXciiuHwOsuPz0ns210vnBhoDF0tC7q3oHBFh6vVEfmetfDd7f3tSSsCQCm0rVV0TzAQKs5jWOdoSrhbSXSucHG5xhDTQEWtFWU7XEAFY1nbhqhAJPlz444WGGNYiAd2glXI0AK2HzF0396aHzgx5mWDThFzXN+O8BlnEDQ4X/ZCH5ytD5QU/AogkfynQF4wIsBSZYDCEwsICWxaKpIWaAVYOIKd7iqRHnBz3OsGjCp1h007/GlKgqpD1VgadGnB8MACwXJ034qW7FcwEzrHi89JaJWw66/VfDTwYDAYvjO96cDz8QwArvgbkItAGLbxyaK6G5AwZYc0uX7g9d/+rmGT/3ltETb2gINcPqO8Gm0gRKEmAlYHLdKf5rzPnBwMDiyWHdRiu8H8BSaIrmkNxy0L2/ffB1nDKkFACLJrzm4qkhNoBVg4gp3cIAsGjCR1yQACtic5tI7ckJ5weVzLBc2rxDqwnzFdwTYCkwwVIIRoBFP8tSUc0QK8CaQazUL32i9P52xT2ssk08OYysaAFWZIY2mY5BYNGEb7IgAtwbYAUQ3eqQ/yi9v93IDKsrdZYJdW616IbixshIjPSRhlVg0YT3UR1+xgBYfnQ2P4pbDrr9V5N2tyt6SjhKb/pZ5qtQmCpH4KGXFCIAFk8OvVRKs4Mww2pW32ju/kTp/Vfjdrcrn2ENvGCmZbgqAZZh83yGHhGwaML7LJyaxwJYNQsa4+3+Wtp/ZbiHVbaGnfBGCxVgGTXOZ9gRAot+ls8CqnEsgFWjmLHe6vHS/qtIZlj0s4wWK8AyapzPsCMGFjMtn4VUw1gAqwYRY7/F40Mv7DP+lPCUXeyEt1PBAMuOV0Eidf0r98GJ8lGc2IDFTvggpTXXoABrLtnS+dGVI1lvFZJHDiyRI+lkK9JOx1mbmQIsm755i/rKM93jOPEDyylaSCd7DtDyVlxzDASw5hAtpZ9cuSbF8BIwwiXhsaUOWrcALa01DrC0OqMgroOrkq/0DzxHvyQ8qfdq9jzZUGABIQwpALAoibEKHP6ztxxMaobVU2Mje4GsUhr6FABY+jxRE9Hh35MFVq+f9SKWhmqKsR8IwNLmiKJ4Dv/W618lOMPqueCeHN4KtBSVJO/D0mSGplgODiRfao1+YV/UTfdhExy0bgNaWmqTGZYWJ5TFcfiYrN/s5XT7V8nOsAae/FdWszM04TWUKMDS4ILCGA73AVbZluwMqxENZQqwNLigMIa/7Ekx7ss4SS0JB964peHtLA1DlyrACu2AwvEPdiRvZSfPDya2D2u0K+7J4VmgFbJkAVZI9ZWO/ei2tJczWWOGNcIgB607gFao0gVYoZRXPO7B1ukDz8ywSoYdyWr2WprwIUoYYIVQXfmYBw+fPj8IsE6alr2OJnyIMgZYIVRXPOb+7yVfXurtv2JJONGojewNHN/xXcoAy7fiysfb/620l1uyBrAqGOWeHN5FP6uCUrVdArBqkzKOGz32m+7TwVMHnlkSjvHXQetNQMtX9QMsX0obGefRjdHnBwHWBAMLWc1WacL7KHGA5UNlI2Ps/0Ly1pjzgwBrgolulnU3sywfZQ6wfKhsZIz9n0q71e9f0cOqaJqD1T3AqqJaC18GsBaWMJ4bXP7Jcf8KYE3x1W0gfQug8l39AMu34orHu/yj8ecHWRL2jXOgehugClXGACuU8srG3ftB7/3t4/ZeJQ8st/S7F1CFLluAFdoBJePvfU/ylQkHnpMFlptRvQNQKSlTjhdoMSJ0HI985/T3B5Pe6e5A9W5AFbouh8dnhqXNkUDxPPKtyecHk5lhuaXfewFVoDKcOizAmipR/Bfsff34/e3J9rCOpOOczu4DVporHmBpdsdTbHsPSb405cBz1DMst/x7H6DyVG4LDQOwFpIvjh9femj09wej72G55d8HAJWlKgZYltxqKNZLX5l+fjCqGZYD1YcAVUPl1OhtAVaj8uq/+c6XetsZRn3OK7oZllv63Q+o9Ffl+AgBlmX3aoh95wsJAMuB6gFAVUO5BL8FwApuQdgAdh/svb89yhmWW/p9FFCFrbB6RwdY9epp7m67nzvuX1X53mBVsAUtLDej+higMleMFQIOWlcV4uOSBhXY+fTxdoaqIKp6XZDCKvp7qT4BrBosm6C3DlJXQTNm8P8r0AWWHDfcTc+w3PJvDVDFXt4AK3aHJ+S3uybr0n9/e9WZU9XrGi+swQAOVJ8CVKmUceN1lYqQFvPc/aRhYIl0ss8AKot1t0jMAGsR9Qz/dufjkreGXidjYknoGuqfBVSGS2+h0AHWQvLZ/fHOR4wBy4Hq84DKbsXVEznAqkdHc3fZeUDWW5nksx65CdDD6mQPAipzBdZQwACrIWG133bnfvXA6mRfBFTa68h3fADLt+IKxtv+sOTLRW87g7oZ1mAv1ZeBlYJSURcCwFJnSfMBbX9Q8uX+/itlwOpkXwVUzVeA3REAll3v5o784vuPvz+oBFid7GuAam5DE/ohwErI7EGqF+9TAiz35O8bgCrBEpw7ZYA1t3Q2f7j9nt52hlFP+7ztw3Kg+iagsllBYaMGWGH19z769rskb7WCAauTfRtQeTc9ogEBVkRmVknlwjuPl4PenhK6GdV3AVUVf7hmsgIAK7EKuXCvR2A5UH0fUCVWYo2mC7AalVffzS+8XYpF3tVeZad7JtLpzt5+CKz0VYDtiACWbf9min7zrZKvSHeGJU013W9yqrPyY0A1kzFcXFkBgFVZKvsXbt3T+/5gE8CSQjrP/Rmgsl8lujMAWLr9qTW6rbtPnx9cdOOoW/7d8nNAVatR3GysAgAroeLYenPvgxN1zLDc0u/5vwRUCZWPilQBlgobmg9iM5d8acSB51lnWG7p98JfA6rmHWOEUQoArETq4vxdvf7VvDOsopDOi38HqBIpF7VpAiy11tQb2Pk3zgcs16O69Q+Aql43uNu8CgCseZUz9rvzdx5/MLVKD8st/dxs7KV/BFbGrI46XIAVtb295DZfI3k25sDzqB6Wg9XLzgOqBErDXIoAy5xlswf8p1dJe0lkrcIu9c6ZLUA1u8L8wpcCAMuX0gHH2Twr61nWa7iParq7PtUrLwKqgBYxdEUFAFZFoSxftnn76PODbul3dhdQWfY2tdgBVuSOn3tF7/3t5V5VIdK54xKgitz6KNMDWFHaepzUuZdLe1lkzRntln6vvgyoIrc86vQAVtT2ijx8m6wXhfzq9X8GVJFbnUR6ACtym8+9RNp3XgFWkducTHoAKxmrSRQF7CsAsOx7SAYokIwCACsZq0kUBewrALDse0gGKJCMAgArGatJFAXsKwCw7HtIBiiQjAIAKxmrSRQF7CvwP8aYFbW6YrepAAAAAElFTkSuQmCC",
-            "extensions:ANGLE_instanced_arrays;EXT_blend_minmax;EXT_clip_control;EXT_color_buffer_half_float;EXT_depth_clamp;EXT_disjoint_timer_query;EXT_float_blend;EXT_frag_depth;EXT_polygon_offset_clamp;EXT_shader_texture_lod;EXT_texture_compression_bptc;EXT_texture_compression_rgtc;EXT_texture_filter_anisotropic;EXT_texture_mirror_clamp_to_edge;EXT_sRGB;KHR_parallel_shader_compile;OES_element_index_uint;OES_fbo_render_mipmap;OES_standard_derivatives;OES_texture_float;OES_texture_float_linear;OES_texture_half_float;OES_texture_half_float_linear;OES_vertex_array_object;WEBGL_blend_func_extended;WEBGL_color_buffer_float;WEBGL_compressed_texture_s3tc;WEBGL_compressed_texture_s3tc_srgb;WEBGL_debug_renderer_info;WEBGL_debug_shaders;WEBGL_depth_texture;WEBGL_draw_buffers;WEBGL_lose_context;WEBGL_multi_draw;WEBGL_polygon_mode",
-            "extensions:ANGLE_instanced_arrays;EXT_blend_minmax;EXT_clip_control;EXT_color_buffer_half_float;EXT_depth_clamp;EXT_disjoint_timer_query;EXT_float_blend;EXT_frag_depth;EXT_polygon_offset_clamp;EXT_shader_texture_lod;EXT_texture_compression_bptc;EXT_texture_compression_rgtc;EXT_texture_filter_anisotropic;EXT_texture_mirror_clamp_to_edge;EXT_sRGB;KHR_parallel_shader_compile;OES_element_index_uint;OES_fbo_render_mipmap;OES_standard_derivatives;OES_texture_float;OES_texture_float_linear;OES_texture_half_float;OES_texture_half_float_linear;OES_vertex_array_object;WEBGL_blend_func_extended;WEBGL_color_buffer_float;WEBGL_compressed_texture_s3tc;WEBGL_compressed_texture_s3tc_srgb;WEBGL_debug_renderer_info;WEBGL_debug_shaders;WEBGL_depth_texture;WEBGL_draw_buffers;WEBGL_lose_context;WEBGL_multi_draw;WEBGL_polygon_mode",
-            "w1[1, 1]",
-            "w2[1, 1024]",
-            "w38",
-            "w4yes",
-            "w58",
-            "w624",
-            "w78",
-            "w816",
-            "w932",
-            "w1016384",
-            "w111024",
-            "w1216384",
-            "w1316",
-            "w1416384",
-            "w1530",
-            "w1616",
-            "w1716",
-            "w184096",
-            "w19[32767, 32767]",
-            "w208",
-            "w21WebKit WebGL",
-            "w22WebGL GLSL ES 1.0 (OpenGL ES GLSL ES 1.0 Chromium)",
-            "w230",
-            "w24WebKit",
-            "w25WebGL 1.0 (OpenGL ES 2.0 Chromium)",
-            "wuv:Google Inc. (Intel)",
-            "wur:ANGLE (Intel, Intel(R) UHD Graphics (0x00004626) Direct3D11 vs_5_0 ps_5_0, D3D11)"
-        ]
-        fp_list_str = "envCollect" + "\xa7".join(fp_list)
-        # 模型与实际网页结果有偏差
-        # return self.h5st_modules.call("generate_webglFp", fp_list_str)
-        return "9ef6901beacde53c5b05944cce35c114"
-
-    def generate_FFA9D23F7A4B3CSS(self, device):
-        # 定位点  getFp: function(e) {
-        return self.m_tk_modules.call("generate_FFA9D23F7A4B3CSS", device["r"])
-
-    def generate_h5st(self, device_info, func_api, input_clt_str, api_query_time, body_str):
-        return self.js_security_modules.call("generate_h5st", device_info, func_api, input_clt_str, api_query_time,
-                                             body_str)
 
     @staticmethod
     def device_list():
@@ -263,25 +215,24 @@ class MJDBase(object):
             "bu8": 0,
             "bu10": 5
         }
-        expand_params = self.generate_expand_params(device=device, device_fp=FFA9D23F7A4B3CSS, extend=extend)
         self.refresh_tk_rd()
+        self.refresh_wx_tk_rd()
         return ({
                     "r": device["r"],  # 用于加密webglFp/FFA9D23F7A4B3CSS
                     "webglFp": webglFp,
                     "FFA9D23F7A4B3CSS": FFA9D23F7A4B3CSS,
 
-                    "expandParams": expand_params,
                     "fp": self.fp,
                     "wx_fp": self.wx_fp,
 
                     "tk": self.tk,
                     "rd": self.rd,
 
-                    "wx_tk": "tk03wc8711d0118nzEHNiry90w1MqMEI3gTCmzmIU7otXtAZjcebYH3cHaloxciaL9sWBbZFVmUzi6ZhlLmFq7eSjf31",
-                    "wx_rd": "XlvJ1LervnKV",
+                    "wx_tk": self.wx_tk,
+                    "wx_rd": self.wx_rd,
 
                     "eid": "N5ENAHSQJ4LCSHAZU6V4ONIBT7H5OWJ7QAT5JANZPLGQUUA2LQVA73SQCFPSMNNODES5ENJECTHFIXO6QZSEYYQTCQ",
-                    "eid_token": "jdd03N5ENAHSQJ4LCSHAZU6V4ONIBT7H5OWJ7QAT5JANZPLGQUUA2LQVA73SQCFPSMNNODES5ENJECTHFIXO6QZSEYYQTCQAAAAMU6WTYHXAAAAAADSX3HOXNL2IKSUX",
+                    "eid_token": self.generate_eid_token(),
                     "time_range": "22",  # js版本固定值,跟随版本变化
 
                     "ccn": device["ccn"],  # 待确认, 可能跟JS版本变化
@@ -319,6 +270,10 @@ class MJDBase(object):
             self.redis.set(self.redis_key, json.dumps(_cache))
 
     def return_info(self, code, **kwargs):
+        # 只要没返回正确数据就清空缓存
+        if code != 1:
+            self.redis.delete(self.redis_key)
+
         # 定义错误码映射
         error_code_mapping = {
             0: "账号不可用",
@@ -429,8 +384,59 @@ class MJDBase(object):
         except Exception as e:
             print(e)
 
-    def device_eid_token(self):
-        return self.device_info["eid_token"]
+    @staticmethod
+    def generate_webglFp(device):
+        # webgl_3d 变化而来
+        # 定位点：_$T4.format(_$T2(_$lw.fofLr.concat(_$lv.join('\xa7'))))
+        # 需要插桩监控 localStorge WQ_gather_wgl1
+        fp_list = [
+            "data:image/png;base64,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",
+            "extensions:ANGLE_instanced_arrays;EXT_blend_minmax;EXT_clip_control;EXT_color_buffer_half_float;EXT_depth_clamp;EXT_disjoint_timer_query;EXT_float_blend;EXT_frag_depth;EXT_polygon_offset_clamp;EXT_shader_texture_lod;EXT_texture_compression_bptc;EXT_texture_compression_rgtc;EXT_texture_filter_anisotropic;EXT_texture_mirror_clamp_to_edge;EXT_sRGB;KHR_parallel_shader_compile;OES_element_index_uint;OES_fbo_render_mipmap;OES_standard_derivatives;OES_texture_float;OES_texture_float_linear;OES_texture_half_float;OES_texture_half_float_linear;OES_vertex_array_object;WEBGL_blend_func_extended;WEBGL_color_buffer_float;WEBGL_compressed_texture_s3tc;WEBGL_compressed_texture_s3tc_srgb;WEBGL_debug_renderer_info;WEBGL_debug_shaders;WEBGL_depth_texture;WEBGL_draw_buffers;WEBGL_lose_context;WEBGL_multi_draw;WEBGL_polygon_mode",
+            "extensions:ANGLE_instanced_arrays;EXT_blend_minmax;EXT_clip_control;EXT_color_buffer_half_float;EXT_depth_clamp;EXT_disjoint_timer_query;EXT_float_blend;EXT_frag_depth;EXT_polygon_offset_clamp;EXT_shader_texture_lod;EXT_texture_compression_bptc;EXT_texture_compression_rgtc;EXT_texture_filter_anisotropic;EXT_texture_mirror_clamp_to_edge;EXT_sRGB;KHR_parallel_shader_compile;OES_element_index_uint;OES_fbo_render_mipmap;OES_standard_derivatives;OES_texture_float;OES_texture_float_linear;OES_texture_half_float;OES_texture_half_float_linear;OES_vertex_array_object;WEBGL_blend_func_extended;WEBGL_color_buffer_float;WEBGL_compressed_texture_s3tc;WEBGL_compressed_texture_s3tc_srgb;WEBGL_debug_renderer_info;WEBGL_debug_shaders;WEBGL_depth_texture;WEBGL_draw_buffers;WEBGL_lose_context;WEBGL_multi_draw;WEBGL_polygon_mode",
+            "w1[1, 1]",
+            "w2[1, 1024]",
+            "w38",
+            "w4yes",
+            "w58",
+            "w624",
+            "w78",
+            "w816",
+            "w932",
+            "w1016384",
+            "w111024",
+            "w1216384",
+            "w1316",
+            "w1416384",
+            "w1530",
+            "w1616",
+            "w1716",
+            "w184096",
+            "w19[32767, 32767]",
+            "w208",
+            "w21WebKit WebGL",
+            "w22WebGL GLSL ES 1.0 (OpenGL ES GLSL ES 1.0 Chromium)",
+            "w230",
+            "w24WebKit",
+            "w25WebGL 1.0 (OpenGL ES 2.0 Chromium)",
+            "wuv:Google Inc. (Intel)",
+            "wur:ANGLE (Intel, Intel(R) UHD Graphics (0x00004626) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        ]
+        fp_list_str = "envCollect" + "\xa7".join(fp_list)
+        # 模型与实际网页结果有偏差
+        # return self.h5st_modules.call("generate_webglFp", fp_list_str)
+        return "9ef6901beacde53c5b05944cce35c114"
+
+    def generate_eid_token(self):
+        # cookie.3AB9D23F7A4B3CSS
+        return "jdd036GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQAAAAMU67YRXUAAAAAAC57VPXOYQGJJUIX"
+
+    def generate_FFA9D23F7A4B3CSS(self, device):
+        # 定位点  getFp: function(e) {
+        return self.m_tk_modules.call("generate_FFA9D23F7A4B3CSS", device["r"])
+
+    def generate_h5st(self, device_info, func_api, input_clt_str, api_query_time, body_str):
+        return self.js_security_modules.call("generate_h5st", device_info, func_api, input_clt_str, api_query_time,
+                                             body_str)
 
     def generate_clt_str(self):
         input_clt_dict = {
@@ -460,7 +466,7 @@ class MJDBase(object):
         # 实现位置：a = Gh["HmacSHA256"](c, n)["toString"](Gh.enc["Hex"]);
         # 参数c "appid:mcashier&body:{body_str}&functionId:platPayChannel"
         # 参数n u_str加密的值
-        u_str = f"{self.device_info['wx_tk']}{self.wx_fp}{ts}{self.wx_ai}{self.device_info['wx_rd']}"
+        u_str = f"{self.device_info['wx_tk']}{self.device_info['wx_fp']}{ts}{self.device_info['wx_ai']}{self.device_info['wx_rd']}"
         return self.wx_h5st_modules.call("generate_wx_u", u_str, self.device_info['wx_tk'], body_str)
 
     def generate_wx_o(self):
@@ -493,49 +499,6 @@ class MJDBase(object):
             str(api_query_time),
             o
         ])
-
-    def generate_expand_params(self, device, device_fp, extend):
-        # TODO bu1 有不同的情况
-        input_expand_params_dict = {
-            "wc": 0,
-            "wd": 0,
-            "l": "zh-CN",
-            "ls": device["language_settings"],
-            "ml": 2,
-            "pl": 5,
-            "av": device["agent_version"],
-            "ua": device["user_agent"],
-            "sua": "Windows NT 10.0; Win64; x64",
-            "pp": {
-                "p1": self.account["pt_pin"]
-            },
-            "extend": extend,
-            "pp1": "",
-            "bu1": "Error: test err\n    at HTMLDocument._$hv [as querySelector] (https://storage.360buyimg.com/webcontainer/js_security_v3_0.1.5.js:5:8206)\n    at https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:12099:25\n    at Array.map (<anonymous>)\n    at preload (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:12084:27)\n    at https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:12129:45\n    at T$1 (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:239:10)\n    at Vk (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:6943:14)\n    at Uk (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:6599:12)\n    at Tk (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:6592:5)\n    at Ik (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:6575:7)",
-            "w": device["w"],
-            "h": device["h"],
-            "ow": device["ow"],
-            "oh": device["oh"],
-            "url": f"https://recharge.m.jd.com/orderDetail?orderId={self.order_id}&serviceType=3&source=41",
-            "og": "https://recharge.m.jd.com",
-            "pf": "Win32",
-            "pr": 1.25,
-            "re": "",
-            "random": "WCMZ-8pKb",
-            "referer": "",
-            "v": self.h5_version,
-            "bu2": "    at _$hE._$rgo (https://storage.360buyimg.com/webcontainer/js_security_v3_0.1.5.js:5:77632)",
-            "canvas": self.canvas,
-            "canvas1": self.canvas,
-            "webglFp": device_fp,
-            "webglFp1": device_fp,
-            "ccn": device["ccn"],
-            "ai": self.ai,
-            "fp": self.fp,
-            "wk": -2
-        }
-        input_expand_params_str = json.dumps(input_expand_params_dict, indent=2, ensure_ascii=False)
-        return self.js_security_modules.call("generate_extend_params", input_expand_params_str)
 
     @staticmethod
     def generate_body_str(data):
@@ -573,19 +536,59 @@ class MJDBase(object):
 
         json_data = {
             'version': '5.0',
-            'fp': 'r3dap9xcr33rrr86',
+            'fp': 'wdpspwpd3racxs31',
             'appId': '8e94a',
-            'timestamp': 1739260092081,
+            'timestamp': 1739329261525,
             'platform': 'web',
-            'expandParams': 'WNpZcw5NsZ3L3tj83ZXRPp3Rj529nQiNmRiBh0W94IjNnQXRfRX9zQXR5xZO3VTMgFTL3Z3L31DB3ZXRPpXNnZ3L3hjB2QXR5xZO3JGNoNDMmFjB2IWMgFWN3EmBmFGA1MDB0QDNp12MzEDL3Z3L3VW9TojA3Ej83ZXRPp3RlVGN2EmN0MjBlJGLkZ2BkNjNkFTA2UDA3UWNgB2A002R5x2RpAV_yQDAiQXR5xZO3BzBiV2MkVjNmNWApRzN38GN3A2B3U2N00GNoBjM3ATN3Z3L3Vm94Ay_4MzR5Z3XtR3A38GNjFGBmNmN1Y2BnRjMoRzM3QDNnFDLoV2AiRzApRXRfRn94Ay_4MzR5Z3XtRH65lEA1cjB5Fz8wICBrsUReYHPx9z_wQS8GcT85hj_wIiBrEyA1lSR8ETAqMTR0AC-lUz__Yn751XPicTAr0jE5hj_wIiBrEyA3Z3L3NG83QXR5xZO31GLkBmMfF2LmwzOkhHNrZmCmBiCgIC-nEiB0MiCmwjOnEz_wUT8rcjB3Ej8qlj_2gnAs0D7kQTNjN2O08DBncT8mcnOfNS9lIS-5JCB5ZXR5RXRfR3NkQzR5Z3XtR3MrZ2OkBiC0oD-zcEMxQXRfR383ZXRPp3R3Z3L3RCAnEzA0QyR5Z3XtR3GpU1Jn4CF-8TN-0zR5x2RscTArUz93ZXRPp3R3Z3L3Fz93ZXRPpHMnhHN5x2RnYyR5Z3XtR3NmhD-CQXRfR3ApQXR5xZO3lj_2gXAvgH_rFjAnUT-2Ez9qd3LmYS8l4zR5x2RyczR5Z3XtRHNllGA2QC8qMyQmlGAp0SE0MD-jQCAmAHMiNmNj5mNl5mMpNGK10190Iz9qcW_wUT80I190Iz9qcH_qMzO1wzOsgHAyQCBxMDAncnOfNS9lIS-3Z3L3pz9kQXR5xZOjVWL5x2RxczR5Z3XtBmNkVWRfRn8qQXR5xZOlBWL5x2RxQXR5xZOjNGMoZ3L39yR5Z3XtRHPixGMiF2MfNy-rVWA4MjMhJWNs5CA1gD-qNS80Mi94cXAlF2NhJzNqFjAnUT-2Ez9qJS7tIjOscjBr9D_w0C83Y2MmhHAyUz9qIi9qd3LmYS8l4TP5tDH5JCB5ZXR5hTCwF2Ln1GMjxm9vgHN1UjBi5WMplX70Iz_wcn9lEj9mUjO1IGMn5WAndHAyQCBxMDAncX8hoTAqlj_2gnAs0D7kQTNjN2O08DBncT8mcnOfNS9lIS-xZn-FYX84YXR5Z3_903NoxGLgF2MfNy-rVWA4MjMhJWNs5CA1gD-qNS80Mi94cXAlF2NhJzNqFjAnUT-2Ez9qJS7tIjOscjBr9D_w0C83Y2MmhHAyUz9qIi9qd3LmYS8l4TP5tDE5JCB5ZXR5hTCwJGNfNWMgB2LmwzOoJDB28WLlZGOhETAr0jOmICAmMCBqJTMkRWL1QmO08z944jB0QiOl4S_1cH_qMzOykD-gEyBpBmNrFjA4Qi_lMiOqxm9pIS8x4XRuAURlUTR5ZXRroEPpV2LgN2NfNy-rVWA4MjMhJWNs5CA1gD-qNS80Mi94cXAlF2NhJzNqFjAnUT-2Ez9qJS7tIjOscjBr9D_w0C83Y2MmhHAyUz9qIi9qd3LmYS8l4TP5VWQFYX84YXR5Z3_9EWMf12NoRGNfNy-rVWA4MjMhJWNs5CA1gD-qNS80Mi94cXAlF2NhJzNqFjAnUT-2Ez9qJS7tIjOscjBr9D_w0C83Y2MmhHAyUz9qIi9qd3LmYS8l4TRlUTR5ZXRroEPiR2Ll5WNnV2LmwzOoJDB28WLlZGOhETAr0jOmICAmMCBqJTMkRWL1QmO08z944jB0QiOl4S_1cH_qMzOykD-gEyBpBmNrFjA4Qi_lMiOqxm9pIS8x4XR1Uj_tEz9pYX84YXR5Z3_903KmEi_s0y_qgDBd5XRpUD_r1CBnQCJ5JCB5ZXR5hTCkR2Lg1WNnV2LmwzOoJDB28WLlZGOhETAr0jOmICAmMCBqJTMkRWL1QmO08z944jB0QiOl4S_1cH_qMzOykD-gEyBpBmNrFjA4Qi_lMiOqxm9pIS8xYX84YXR5Z3_903NgZWLfF2LmwzOkhHNrZmCmBiCgIC-nEiB0MiCmwjOnEz_wUT8rcjB3Ej8qlj_2gnAs0D7kQTNjN2O08DBncT8mcnOfNS9lIS-xZHCncT82ET_0ME7nED8oYn94sURXoTQ6gX8rED_kMj_VoFGF4VRlUTR5ZXRro09nETRlMCAlY3Lncz9nE1R5x2RoFyB3ZXRPp3R3Z3L3VW9pQXR5xZOcYXRPFWRfRXNoFyB3ZXR5Z3XtZWRfRXLkQzR5ZXR5xZOpZ3L39G83QXR5ZXRPpXM5x2RjFyB3ZXR5Z3XtZWRfRHMkQzR5ZXR5xZOpZ3L3JG83QXR5ZXRPpXMkZ3L3NG83QXR5ZXRPpXN5x2RnFyB3ZXR5Z3XtRHMrV2OpRXRfRHNkQzR5ZXR5xZOpZ3L3tj83ZXR5Z3XtFWRfRn9tQXR5ZXRPpXN5x2RtQXR5ZXRPpXN5x2R18yR5ZXR5xp75x2R1gDAl4CA3ZXRPpH65Z3X3NGNkVGLo4z73Z3L3VW93ZXR5Z3XeY3L3ZS93ZXRPp3RlBW75tWMjhD-CYnLphXNoZXELYn9icTAr0jE3Z3L3VD8mQXR5xZO3BmNr9mNkdH-nUzA4MURphXNrZ2OnNGNqFD_qQS-WYHPqsjB08VR0sD-tYXONkVERsVP5BmNr9mNkdX8ws1B08EAtYS9YYHPlBW75tWMjhD-CYnLphXNoZXELYn9icTAr0jExZXNrFmO4oT_wwi_MQXRfRHBkQXR5xZO3BmNr9mNkdH-nUzA4MURphXNrZ2OnNGNqFD_qQS-WYHPqsjB08VR0sD-tYXONkVERsVP5BmNr9mNkdX8ws1B08EAtYS9YYHPlBW75tWMjhD-CYnLphXNoZXELYn9icTAr0jExZXNrF2R5x2RjUzR5Z3XtFWRfRX_pQXR5xZOnZ3L3pD_3ZXRPp3RqsTOrETOxwSOLMFOxwyR5x2RmozR5Z3XtR3GWkX-fQXRfRX_3ZXRPpXN5x2R18yR5Z3XtZWRfRnBiQXR5xp7',
+            'expandParams': 'WNpZcw5NsZ3L3tj83ZXRPp3RoNm9hMDBnMWAp8S9mYSAiQXRfRX9zQXR5xZO3VTMgFTL3Z3L31DB3ZXRPpXNnZ3L3hjB2QXR5xZO3JGNoNDMmFjB2IWMgFWN3EmBmFGA1MDB0QDNp12MzEDL3Z3L3VW9TojA3Ej83ZXRPp3RlVGN2EmN0MjBlJGLkZ2BkNjNkFTA2UDA3UWNgB2A002R5x2RpAV_yQDAiQXR5xZO3BzBiV2MkVjNmNWApRzN38GN3A2B3U2N00GNoBjM3ATN3Z3L3Vm94Ay_4MzR5Z3XtR3A38GNjFGBmNmN1Y2BnRjMoRzM3QDNnFDLoV2AiRzApRXRfRn94Ay_4MzR5Z3XtRH65lEA1cjB5Fz8wICBrsUReYHPx9z_wQS8GcT85hj_wIiBrEyA1lSR8ETAqMTR0AC-lUz__Yn751XPicTAr0jE5hj_wIiBrEyA3Z3L3NG83QXR5xZO31GLkBmMfF2LmwzOkhHNrZmCmBiCgIC-nEiB0MiCmwjOnEz_wUT8rcjB3Ej8qlj_2gnAs0D7kQTNjN2O08DBncT8mcnOfNS9lIS-5JCB5ZXR5RXRfR3NkQzR5Z3XtR3MrZ2OkBiC0oD-zcEMxQXRfR383ZXRPp3R3Z3L3RCAnEzA0QyR5Z3XtRnFKUF8fY0IwYW8m00R5x2RscTArUz93ZXRPp3R3Z3L3Fz93ZXRPpHMnhHN5x2RnYyR5Z3XtR3NmhD-CQXRfR3ApQXR5xZO3lj_2gXAvgH_rFjAnUT-2Ez9qd3LmYS8l4zR5x2RyczR5Z3XtRHNllGA2QC8qMyQmlGAp0SE0MD-jQCAmAHMiNmNj5mNl5mMpNGK10190Iz9qcW_wUT80I190Iz9qcH_qMzO1wzOsgHAyQCBxMDAncnOfNS9lIS-3Z3L3pz9kQXR5xZOjVWL5x2RxczR5Z3XtBmNkVWRfRn8qQXR5xZOlBWL5x2RxQXR5xZOjNGMoZ3L39yR5Z3XtRHPjRmNfV2LmwzOr0D_rFT7yESAphXMpdENodUMnZ2N6ET_wQj_scEBxMT8pUjBqNy-qZCB2wjO0Mz9kcj90Qi9vcH_qMzOykD-gEyBpBmNrFjA4Qi_lMiOqxm9pIS8x4XRrYX84YXR5Z3_90HLo1WMmV2LhJ2LmwzOr0D_rFT7yESAphXMpdENodUMnZ2N6ET_wQj_scEBxMT8pUjBqNy-qZCB2wjO0Mz9kcj90Qi9vcH_qMzOykD-gEyBpBmNrFjA4Qi_lMiOqxm9pIS8x4XRgJWA2gHAtESAqkVRlUTR5ZXRroEPjRmNfV2LmwzOr0D_rFT7yESAphXMpdENodUMnZ2N6ET_wQj_scEBxMT8pUjBqNy-qZCB2wjO0Mz9kcj90Qi9vcH_qMzOykD-gEyBpBmNrFjA4Qi_lMiOqxm9pIS8x4XRrYX84YXR5Z3_90XNk1WMnxWNnxm9vg3_wkzO04iAkITNrJWN6UGN6I2NpRmC0oD-3cD_6UT-2IS94MjOmwjOpUjBvcHA2QC8qMCAnMy-qlj_2gnAs0D7kQTNjN2O08DBncT8mcnOfNS9lIS-xZnB2EWM5JCB5ZXR5hTCwB2NmxGNfNy-rhD-sgHAh8D81Y2OlZmCoVmClRWNndEAt0zBqkjC44jBlYCB2cn9vcX94Mz-qFjBnEi_mEz9mwjOscjBr9D_w0C83Y2MmhHAyUz9qIi9qd3LmYS8l4TP5hTRlUTR5ZXRroEPmJ2Nh92LpR2LmwzOr0D_rFT7yESAphXMpdENodUMnZ2N6ET_wQj_scEBxMT8pUjBqNy-qZCB2wjO0Mz9kcj90Qi9vcH_qMzOykD-gEyBpBmNrFjA4Qi_lMiOqxm9pIS8x4XRm52AlZX84YXR5Z3_90XLj5mNixWNnxm9vg3_wkzO04iAkITNrJWN6UGN6I2NpRmC0oD-3cD_6UT-2IS94MjOmwjOpUjBvcHA2QC8qMCAnMy-qlj_2gnAs0D7kQTNjN2O08DBncT8mcnOfNS9lIS-xZX95JCB5ZXR5hTCwBWLmJmMfZ2NfNy-rhD-sgHAh8D81Y2OlZmCoVmClRWNndEAt0zBqkjC44jBlYCB2cn9vcX94Mz-qFjBnEi_mEz9mwjOscjBr9D_w0C83Y2MmhHAyUz9qIi9qd3LmYS8l4TP5BSRlUTR5ZXRroEPlBGMl92LpR2LmwzOr0D_rFT7yESAphXMpdENodUMnZ2N6ET_wQj_scEBxMT8pUjBqNy-qZCB2wjO0Mz9kcj90Qi9vcH_qMzOykD-gEyBpBmNrFjA4Qi_lMiOqxm9pIS8x4XRhYX84YXR5Z3_903NgZWLfF2LmwzOkhHNrZmCmBiCgIC-nEiB0MiCmwjOnEz_wUT8rcjB3Ej8qlj_2gnAs0D7kQTNjN2O08DBncT8mcnOfNS9lIS-xZHCncT82ET_0ME7nED8oYn94sURXoTQ6gX8rED_kMj_VoFGF4VRlUTR5ZXRro09nETRlMCAlY3Lncz9nE1R5x2RoFyB3ZXRPp3R3Z3L3VW9pQXR5xZOcYXRPFWRfRXNoFyB3ZXR5Z3XtZWRfRXLkQzR5ZXR5xZOpZ3L39G83QXR5ZXRPpXM5x2RjFyB3ZXR5Z3XtZWRfRHMkQzR5ZXR5xZOpZ3L3JG83QXR5ZXRPpXMkZ3L3NG83QXR5ZXRPpXN5x2RnFyB3ZXR5Z3XtRHMrV2OpRXRfRHNkQzR5ZXR5xZOpZ3L3tj83ZXR5Z3XtFWRfRn9tQXR5ZXRPpXN5x2RtQXR5ZXRPpXN5x2R18yR5ZXR5xp75x2R1gDAl4CA3ZXRPpH65Z3X3NGNkVGLo4z73Z3L3VW93ZXR5Z3XeY3L3ZS93ZXRPp3RlBW75tWMjhD-CYnLphXNoZXELYn9icTAr0jE3Z3L3VD8mQXR5xZO3BmNr9mNkdH-nUzA4MURphXNrZ2OnNGNqFD_qQS-WYHPqsjB08VR0sD-tYXONkVERsVP5BmNr9mNkdX8ws1B08EAtYS9YYHPlBW75tWMjhD-CYnLphXNoZXELYn9icTAr0jExZXNrFmO4oT_wwi_MQXRfRHBkQXR5xZO3BmNr9mNkdH-nUzA4MURphXNrZ2OnNGNqFD_qQS-WYHPqsjB08VR0sD-tYXONkVERsVP5BmNr9mNkdX8ws1B08EAtYS9YYHPlBW75tWMjhD-CYnLphXNoZXELYn9icTAr0jExZXNrF2R5x2RjUzR5Z3XtFWRfRX_pQXR5xZOnZ3L3pD_3ZXRPp3RqsTOrETOxwSOLMFOxwyR5x2RmozR5Z3XtR3GWkX-fQXRfRX_3ZXRPpXN5x2R18yR5Z3XtZWRfRnBiQXR5xp7',
             'fv': 'h5_file_v5.0.6',
-            'localTk': 'tk04wcb14181b41lMXgzeDN4MyszXR5MhRy9nMmNnMT7gZCB1M29ZZJZFLqb7Su8lZ2-o927yUFH3I1HrIDApNGNjRmB',
+            'localTk': 'tk04w1379534941lMSsyKzJ4M1hoXRJNmNS72Uz9mJT9iYi9pIj8ZZJZF3qTK0t8lZ2-o927yUFH3I1HrI2NkJWMzQ2M',
         }
 
         response = self.get_response(url=url, json_data=json_data)
         resp_json = response.json()
         self.tk = resp_json["data"]["result"]["tk"]
         self.rd = re.search(r"rd=\'(.*?)\';", resp_json["data"]["result"]["algo"]).group(1)
+
+    def refresh_wx_tk_rd(self):
+        url = "https://cactus.jd.com/request_algo?g_ty=ajax "
+        headers = {
+            "Host": "cactus.jd.com",
+            "Connection": "keep-alive",
+            "Content-Length": "1732",
+            "Pragma": "no-cache",
+            "Cache-Control": "no-cache",
+            "sec-ch-ua-platform": "Windows",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
+            "accept": "application/json",
+            "sec-ch-ua": '"Not A(Brand";v="8", "Chromium";v="132", "Google Chrome";v="132"',
+            "content-type": "application/json",
+            "sec-ch-ua-mobile": "?0",
+            "Origin": "https://mpay.m.jd.com",
+            "Sec-Fetch-Site": "same-site",
+            "Sec-Fetch-Mode": "cors",
+            "Sec-Fetch-Dest": "empty",
+            "Referer": "https://mpay.m.jd.com/",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7"
+        }
+        self.session.headers.clear()
+        self.session.headers.update(headers)
+
+        json_data = {
+            "version": "3.1",
+            "fp": "3606331785990409",
+            "appId": "303a7",
+            "timestamp": 1739328273670,
+            "platform": "web",
+            "expandParams": "5e2976855ec13d55dbffcc514b657c9ec71b38bcd7d88f101ff260cf6b8a04fae8a99396e1282784963bc1d386b5684f791a6c8710dd1f7a12f19689ea0c944cf5deb0e2f9242196f7d8e4fd5216f37b3d9fa8786e04aa0519c762c096bb2f35ca2fcd07201e8107f8a9c50674a879a0ceeaf92f45019082ac327d4f0956bf72a372ef93472dbeecabf9fe241da9c7921979762be6662fb02565255ca9d03a8d778e5847d5485d23e48546da1bd14670355172b1dbd50a06d9ae3561b00c8ba6288f4f0aca7bde1bacd385cdc1116025bf33b02d90d6250582c4e4bfa6a2745979e48bcace8663b5cafd3def204d642f60d0e1cc1bd51984cda30b76627fb1ebba1785937c9102fb0ef56de1619cbb9b700d60964f90df3c8529ba3fca4f2e5c451af4ae655d720fcb4b46b8ad33c12c0e6b2b3b2619b3e6d21e419c7713a5ff941742c28ef1cdabd12785564c0c0d04135e2518a913462372116922dbb939157f549786c0eb192e5f017661ed4951fa9a55ccec79c11667e9a8ef88c078bb4d35ccebfff75c9702047c30188b55e3ab4f331d4d19fda3963f270c098eea170e719301af2f8728f51424c6f1d8fd3d95c55757a35348537cc932b43f2876c224bccc811ed668e35f72fcfed57dc808a6d1ae04263bbee86c4f3fea8e7dc0d0313c95338d18c9a5b5dbc8c69f219e4a38fea622c4e6de5860e0db5149a0078c91e719a3c10045f31c013673d9ab3cb08dd3e13bdbc22766dff14488236df767f15948c68ca1eb6815ce7ac10d5a0baf35d30eba5be9ed99eb7da434442556f3e06427b7f62b4118e9d7a6169146f773946ee5c757582df2f00e29c33777a827843b9df042173a1b69f2b1c0c39e586ce5724667d916196906a4ee90bb959920ac50fee4716bf8c83e43e504f49bf136ddff389eb6ff95a20239678c480caec46dba80a5d5eca7a9d5cce9066cdcd4971b4be773c5c4eacd6df03731bf911cf31566a69f846f4d8209dd948f4a0bc17d07eee49ac754d02a82a6ec93ce857ee05bcbf0d4324ef42513bbd3ae3a341ae9d6a57188380d63354108a8e0920b05dfa36a6099e2a03fd1103b8e218efbdb02c9e6b92ab2c9114beb8ab5b599e27e0715",
+            "fv": "v3.2.0"
+        }
+
+        response = self.get_response(url=url, json_data=json_data)
+        resp_json = response.json()
+        self.wx_tk = resp_json["data"]["result"]["tk"]
+        self.wx_rd = re.search(r"rd=\'(.*?)\';", resp_json["data"]["result"]["algo"]).group(1)
 
     @staticmethod
     def decrypt_des(encrypted_data: str, key: str, mode: str = 'ECB') -> Union[dict, None]:

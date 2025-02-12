@@ -68,8 +68,6 @@ class MJDOrder(MJDBase):
         }
         body_str = self.generate_body_str(body)
 
-        # 设备指纹信息
-        eid_token = self.device_eid_token()
         params = {
             'appid': 'tsw-m',
             'functionId': func_api,
@@ -77,7 +75,7 @@ class MJDOrder(MJDBase):
             'body': json.dumps(body, separators=(',', ':')),
             'uuid': self.device_info["uuid"],
             'screen': self.device_info["screen"],
-            'x-api-eid-token': eid_token
+            'x-api-eid-token': self.generate_eid_token()
         }
 
         # 合成clt的设备参数
@@ -92,7 +90,6 @@ class MJDOrder(MJDBase):
 
         resp = self.get_response('https://api.m.jd.com/api', params=params)
         resp_json = resp.json()
-        print(resp_json)
 
         if resp_json["code"] == "3":
             log_error(f"查询SKU详情失败 账号不可用：{self.account['pt_pin']}")
@@ -105,7 +102,7 @@ class MJDOrder(MJDBase):
         self.brand_id = resp_json["result"]["brandId"]
         self.sku_price = resp_json["result"]["skuPrice"]
         self.sku_type = resp_json["result"]["type"]
-        # self.get_init_order()
+        self.get_init_order()
 
     # 初始化订单
     def get_init_order(self):
@@ -151,8 +148,6 @@ class MJDOrder(MJDBase):
         }
         body_str = self.generate_body_str(body)
 
-        # 设备指纹信息
-        eid_token = self.device_eid_token()
         post_data = {
             'appid': 'tsw-m',
             'functionId': func_api,
@@ -160,7 +155,7 @@ class MJDOrder(MJDBase):
             'body': json.dumps(body, separators=(',', ':')),
             'uuid': self.device_info["uuid"],
             'screen': self.device_info["screen"],
-            'x-api-eid-token': eid_token
+            'x-api-eid-token': self.generate_eid_token()
         }
 
         # 合成clt的设备参数
@@ -176,7 +171,6 @@ class MJDOrder(MJDBase):
 
         resp = self.get_response('https://api.m.jd.com/api', data=post_data)
         resp_json = resp.json()
-        print(resp_json)
 
         if not resp_json.get("result"):
             log_error(f"获取初始化订单ID失败：{resp_json}")
@@ -191,6 +185,7 @@ class MJDOrder(MJDBase):
     # 生成订单
     def get_payinfo(self):
         func_api = "getPayChannel"
+        print(func_api)
 
         headers = {
             'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7',
@@ -225,10 +220,8 @@ class MJDOrder(MJDBase):
             "version": self.body_info["version"],
             "orderSource": self.body_info["orderSource"],
         }
-        pprint.pp(body)
         body_str = self.generate_body_str(body)
 
-        # 设备指纹信息
         params = {
             'appid': 'tsw-m',
             'functionId': func_api,
@@ -236,7 +229,7 @@ class MJDOrder(MJDBase):
             'body': json.dumps(body, separators=(',', ':')),
             'uuid': self.device_info["uuid"],
             'screen': self.device_info["screen"],
-            'x-api-eid-token': self.device_eid_token()
+            'x-api-eid-token': self.generate_eid_token()
         }
 
         # 合成clt的设备参数
@@ -248,11 +241,9 @@ class MJDOrder(MJDBase):
         params.update({
             'h5st': h5st
         })
-        pprint.pp(params)
 
         resp = self.get_response('https://api.m.jd.com/api', params=params)
         resp_json = resp.json()
-        pprint.pp(resp_json)
 
         if resp_json["msg"] != "成功":
             log_error(f"获取支付信息失败：{resp_json}")
@@ -273,6 +264,7 @@ class MJDOrder(MJDBase):
     def get_client_action(self):
         url = "https://api.m.jd.com/client.action"
         func_api = "platWapWXPay"
+        print(func_api)
 
         headers = {
             'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7',
@@ -301,8 +293,10 @@ class MJDOrder(MJDBase):
 
         # 请求体
         body = {
-            "appId": self.wx_appid,
-            "payId": self.wx_payid,
+            # "appId": self.wx_appid,
+            # "payId": self.wx_payid,
+            "appId": "m_D1vmUq63",
+            "payId": "2facacb46a98482ea168b59a58afc888",
             "eid": self.device_info["eid"],
             "source": "mcashier",
             "origin": "h5",
@@ -321,13 +315,12 @@ class MJDOrder(MJDBase):
 
         data = {
             'body': json.dumps(body, separators=(',', ':')),
-            'x-api-eid-token': self.device_info["eid_token"],
+            'x-api-eid-token': self.generate_eid_token(),
             'h5st': h5st,
         }
 
         resp = self.get_response(url=url, params=params, data=data)
         resp_json = resp.json()
-        pprint.pprint(resp_json)
 
         if not resp_json.get("payInfo"):
             log_error(f"获取微信支付信息失败：{resp_json}")
@@ -347,6 +340,7 @@ class MJDOrder(MJDBase):
 
     # 获取微信支付链接
     def get_wx_paylink(self):
+        print("get_wx_paylink")
         url = "https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkmweb"
 
         headers = {
@@ -372,6 +366,8 @@ class MJDOrder(MJDBase):
         params = {
             'prepay_id': self.wx_prepay_id,
             'package': self.wx_package,
+            # 'prepay_id': "wx121534548739085386c678a53629ad0001",
+            # 'package': "672377801",
         }
         resp = self.get_response(url=url, params=params)
 
@@ -388,6 +384,15 @@ class MJDOrder(MJDBase):
                 if error_msg:
                     log_error(f"获取微信支付链接失败：{error_msg}")
                     return self.return_info(code=18, error_msg=error_msg)
+
+            if "验证码加载失败，请稍后重试" in resp_text:
+                print("--- 遇到验证码 ---")
+                captcha_id = re.findall(r"TencentCaptcha\(document.getElementById\('captcha-view'\),'(\d+)'", resp_text)[0]
+                print(captcha_id)
+
+                # cap_union_prehandle
+                # cap_union_new_verify
+                # checkcaptcha
 
     # 查询
     def get_order_detail(self):
@@ -437,7 +442,7 @@ class MJDOrder(MJDBase):
             'body': json.dumps(body, separators=(',', ':')),
             'uuid': self.device_info["uuid"],
             'screen': self.device_info["screen"],
-            'x-api-eid-token': self.device_info["eid_token"]
+            'x-api-eid-token': self.generate_eid_token()
         }
 
         # 合成clt的设备参数
@@ -513,7 +518,7 @@ if __name__ == '__main__':
     }
     _sku_id = "10022039398507"
     # _order_id = "307843863375"
-    _order_id = "309531051382"
+    _order_id = "310102692193"
     # _order_id = "309488931894"   # 测试
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
     # mo.run_create()
