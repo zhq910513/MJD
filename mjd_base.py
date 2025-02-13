@@ -14,6 +14,7 @@ from Crypto.Util.Padding import unpad
 from curl_cffi import requests
 
 from auto_proxy import get_proxies
+from plugins.log import log_error
 from plugins.redis_ctl import RedisCtrl
 
 
@@ -77,6 +78,8 @@ class MJDBase(object):
         self.rd = None
         self.wx_tk = None
         self.wx_rd = None
+        self.eid = None
+        self.eid_token = None
         self.device_info = None
         self.body_info = {
             "version": "1.10",
@@ -232,8 +235,8 @@ class MJDBase(object):
                     "wx_tk": self.wx_tk,
                     "wx_rd": self.wx_rd,
 
-                    "eid": "RXMLKGZ4YZY6MCUCNJCMGOCDS6JASZZBS2US2EYAQ4EQH6B6NBWQMUWPCSUWITJNVIQMMA52ACFEIRTUO5SUPTTEOQ",
-                    "eid_token": self.generate_eid_token(),
+                    "eid": self.eid,
+                    "eid_token": self.eid_token,
                     "time_range": "22",  # js版本固定值,跟随版本变化
 
                     "ccn": device["ccn"],  # 待确认, 可能跟JS版本变化
@@ -362,7 +365,7 @@ class MJDBase(object):
         session.headers.update(headers)
         return session
 
-    def get_response(self, url, params=None, json_data=None, data=None, allow_redirects=False):
+    def get_response(self, url, params=None, json_data=None, data=None, allow_redirects=False, retry=1):
         try:
             if not json_data and not data:
                 if self.proxies:
@@ -380,7 +383,11 @@ class MJDBase(object):
             response.raise_for_status()
             return response
         except Exception as e:
-            print(e)
+            if retry < 2:
+                self.proxies = None
+                return self.get_response(url, params, json_data, data, allow_redirects)
+            else:
+                log_error(e)
 
     @staticmethod
     def generate_webglFp(device):
@@ -423,10 +430,6 @@ class MJDBase(object):
         # 模型与实际网页结果有偏差
         # return self.h5st_modules.call("generate_webglFp", fp_list_str)
         return "9ef6901beacde53c5b05944cce35c114"
-
-    def generate_eid_token(self):
-        # cookie.3AB9D23F7A4B3CSS
-        return "jdd03RXMLKGZ4YZY6MCUCNJCMGOCDS6JASZZBS2US2EYAQ4EQH6B6NBWQMUWPCSUWITJNVIQMMA52ACFEIRTUO5SUPTTEOQAAAAMU7L753LIAAAAACIY7OZJR6KBUOEX"
 
     def generate_FFA9D23F7A4B3CSS(self, device):
         # 定位点  getFp: function(e) {
@@ -592,6 +595,36 @@ class MJDBase(object):
         resp_json = response.json()
         self.wx_tk = resp_json["data"]["result"]["tk"]
         self.wx_rd = re.search(r"rd=\'(.*?)\';", resp_json["data"]["result"]["algo"]).group(1)
+
+    def refresh_eid_eidtoken(self):
+        url = "https://jra.jd.com/jsTk.do"
+        headers = {
+            'Accept': '*/*',
+            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            # 'Cookie': '__jdv=122270672%7Cdirect%7C-%7Cnone%7C-%7C1738840583837; mba_muid=17388405838361203117691; shshshfpa=9ee2cd02-57f9-72c5-f778-0351f1e1997b-1735542848; shshshfpx=9ee2cd02-57f9-72c5-f778-0351f1e1997b-1735542848; TrackerID=j6Y1xjLelmeAYTWyVhfOmwoTBWNJiGcOiYeqGh3jC5-hDZ-uGogPTYRJXtBKFae8lIwR4DiVxw48dXzRf0ROSNwZmaxnSsPPHo-wfMRL2ig; pt_key=AAJnpJozADAjZd8TJAQjJAk4hJDaveKHCIU3lN7FHKi8s0AFdjFBr_ax9PcAs9AcRK8xVg1plSw; pt_pin=zhq91513; pt_token=yo4fvkms; pwdt_id=zhq91513; sfstoken=tk01m96a11b38a8sMXgyZTNJRncz6QXU3gADDNZW/LcuQWbEEx18r0xr49CtNd4nGZOuIAr0+00MiKM6ET1Ou6AoLmny; retina=0; cid=9; webp=1; visitkey=8719492081381946543; 3AB9D23F7A4B3C9B=6GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQ; wxa_level=1; sc_width=1536; __jdc=122270672; appCode=ms0ca95114; __wga=1739331681742.1739331681742.1739326616108.1739326616108.1.2; PPRD_P=UUID.17388405838361203117691-LOGID.1739331681750.428681721; shshshfpb=BApXSWdQ3-_FAFGMSpb6ccUWxaiZKJyihBncVL2dg9xJ1OsZTbN-Hx0u4ZQPoNOY; jxsid=17394187664092400310; wqmnx1=MDEyNjM3Ni9jNzg2aTBvMWk2bHQ2TCAgLzBhLjMyVUIyUkkqKSU%3D; __jda=122270672.17388405838361203117691.1738840583.1739418766.1739444624.19; cd_eid=jdd036GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQAAAAMU735KAZAAAAAAD5CZFOQQ64O2BUX; pt_st=1_VqXC-HzWzN0nusiPayQz8nvpBcED6XL8_ArbbajhLJpoxVGMSDuCWmlfLLIVy038YNt3GNI9U_n8iX29y3S8T9h6U2eYbhgQypCOOwLZrhNentqFO1ruRwvQnu-XcQxjMyKdn1c6CEUlGyXoRwyx5zQY0-flVYLL8shdrev27n97CFubcaAcjW4dO9Fmej697XU4h1fCDdESWYSK-FtfXmSvFJbVoq**; 3AB9D23F7A4B3CSS=jdd036GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQAAAAMU7374HPYAAAAACWSZXNFIZYAX4YX; __jdb=122270672.7.17388405838361203117691|19.1739444624; mba_sid=17394446249697966836587765418.11',
+            'Origin': 'https://recharge.m.jd.com',
+            'Pragma': 'no-cache',
+            'Referer': 'https://recharge.m.jd.com/',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-site',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36',
+            'content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            'sec-ch-ua': '"Not A(Brand";v="8", "Chromium";v="132", "Google Chrome";v="132"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+        }
+        self.session.headers.clear()
+        self.session.headers.update(headers)
+
+        data = 'a=7TJI7TceW0Pu7Tce7TZ37Tce7Tce7T7L7TcezlP47Tce7TZ37Tce7Tce7T7L7TceiQPmSg6PwHcPwj<PwH7gSf7AfANwvf7N6jb3A4JN7Tce7T7L7TceFQwPwHcPwj<PwHclRkWegHZcfT7ZwjJiS49hTARSg4p1ZA93AjkSRNfTwjkcTk35gLF3SfalTHJSwP3cZ<kFf49c6T75SB7ZABZLRN3Nfjbvf<R1Z4slATFAAHR7gLR6fPPZTP<PwHcPw4wPwH7CzlRP7Tce7TZ37TceWtReygZj7Tce7T7L7TceWIAewGAB6SAewdwPwHcPw4wPwH7QWIAewGAB6SAewQFQwTwjwLb4O0ikFLFGiTwkiT7HOT6xOgADiH7bwH6e7Tce7T7L7TceitREW0APwHcPwj<x7T7L7TceJGAewGAB6SAewH6uwGDDvH2PwHcPw4wPwH7*JGAewGAB6SAewH2ehlkjhBfwg<CVZH2lZTwEZB2kOL4PwHcPw4wPwH7Q7Tce7TZ37TceweAewGAe6eAewdwPwHcPwj<PwH7QigAkFLikiT2BwlAewTiBZgfHw0ADwB4*ZLNPF0RbOSAewGAe6eAewQ8PwHcPwj<PwH7eFgZoih7dFSECvQp4vQZXzSAeRQ9eF0feR0fjigPs7Tce7T7L7TceWhwPwHcPwj<PwH7XWQRPW4P47TZ<wB2tOL6BOLiBwBWk7TclWlfeJQPHFfREW0APwj6B7TclWl9kWQZP7TZ<ZL<PwHcPw4wPwH7UWkRr7Tce7TZ37TceyQR4wLwlRkWegHZcfT7ZwjJiS49hTARSg4p1ZA93AjkSRNfTwjkcTk35gLF3SfalTHJSwP3cZ<kFf49c6T75SB7ZABZLRN3Nfjbvf<R1Z4slATFAAHR7gLR6fPPZTPN36AN3TfAtwBWjSN3F6AN36ANLfkZyg<E0SfpF6fajgfaPwHcPw4wPwH7xySAewGAB6SAewGAewGAtR2/&d=7TJI7TceJ1wPwHcPwj<PZjcPwH74FhFpilfAygkP7Tce7TZ3wTWBOT6jZT<kZHwewGAe6eAewQRPJQPHFAfuFNRpzgAPwHcPwj<xZBwEZL6kwTAlwBAe7TJ<7T7L7Tceil<PwHcPwj<PZjcPwH7jF<bbWlaPwHcPwj<PwHc*FQctFH<xOgAewg7GZQcxZlceiH34wBwBiTAlwTJGFGAewGAe6eAewQZXzdRPq1ROigkP7Tce7TZ37TceJlfGFl*Pw4ZPq13PWQPCFgEjig*CJlfGFl*PwHcPw4wPwH7tFg7dz1FPWdZpzlDPwHcPwj<PwH7hFg71TIAewL<uwIAewIb5W0fuRj*PwH3NAeAewLcuwIAew<ZoWQ9CyhfCKSAewGAe6eAewdZoigRpzQJwfGAewGAB6SAewPJPi4Jw7Tc*RjxTTIAew<fT7Tc*wSD*7Tc*K<9*FgE1TIAew<fT7Tc*RjxTTIAew<fT7Tc*wSD*7Tc*6lbezlkpJgjp7Tce7T7L7TceJQfuF09e7Tce7TZ37TceflfGSlPj7Tce7T7L7TceWQfuF0feFhcPwHcPwj<PwH7hFg7vyh6PwH3hFg71TIAewGAe6eAewQfDJ0fuWlPXzdwPwHcPwj<PZAcPwH73T4JwRf9pzdZjigEHFgRVih7eihPB7Tce7T7L7TceRfbAhl7sFgE4hlkpzQkbqIAewGAe6eAew4fifN9Hz0P*hlZXzdRezl*PwHcPw4wPwH7NgNRVil9szt7VidfQFQfehlbbz0FVFQxXih6PwHcPw4wPwH7NgNRVF0f*J0bVilxbzh2PwHcPw4wPwH7NgNRVF0PByQ9pzdRVJ0PCFh7VWhfPWd4PwHcPw4wPwH7NgNRVFQxXihRViQxPzQ6PwHcPw4wPwH7NgNRVFd7bFk94Fh3jyIAewGAe6eAew4fifN9*zlxEFl9uhl9QFdZPJN9Hz0NCWIAewGAe6eAew4fifN9By0N4Fh7VJ0fDJ1feFf9szl6PwHcPw4wPwH7NgNRVJ0fDJ1feFf9Hzlk*WQfBWlPXzP9GW1RH7Tce7T7L7TceRfbAhtRPq1RkWQfVil9CW17PWtZpzlEVWQJjieAewGAe6eAew4fifN9jFhbjJh7PhlFpz1RPWP9bzQPBztRezt3pieAewGAe6eAew4fifN9jFhbjJh7PhlkpWd7XWP9Hz0NCWN9jzk9PF0JP7Tce7T7L7TceRfbAhtZSRjcPwHcPw4wPwH7vSN7VW0NeigxsFgxVWlbbF0fehlZXzh3pz0APwHcPw4wPwH75RfZVFgxPzgfuJN9pzQRPqN9kygEj7Tce7T7L7TceTjfThlFGzk9eFgE4Fh7VzgP*zgN*7Tce7T7L7TceTjfThtZjigE4ih74hlRPWQPlihRpJQfB7Tce7T7L7TceTjfThtRPq1RkWQfVFQxXih6PwHcPw4wPwH75RfZVJ0fDJ1feFf9Qz09bJN9sygEPihcPwHcPw4wPwH75RfZVJ0fDJ1feFf9oigxQhlFszlNj7Tce7T7L7TceTjfThtRPq1RkWQfVy0NsFP9Qz09bJN9sygEPihcPwHcPw4wPwH75RfZVJQfeJ0fDhlNeWQNEhl9GyQfHJIAewGAe6eAewPJN64Jwhl7sFgE4hlFkzQZVFhbjFgE4Fg6PwHcPw4wPwH7hRA71TN9HzlxXWP9GJgFQFh7VFQxXih6PwHcPw4wPwH7hRA71TN9Hzlk*WQfBWlf4htRPq1RkWQfVWBZjieAewGAe6eAewPJN64JwhlZXzh3eFhZBFgRVJ0fDJ1feFf9BwtRHhtZeFlcPwHcPw4wPwH7hRA71TN94Fg7kFk9eFgE4Fh7PWP9pzQFX7Tce7T7L7TcefjfIRjxVF0fGJgJVWlbbF0feWeAewGAe6eAewPJN64JwhlRPW1RohtRPq1RkWQAPwHcPw4wPwH7hRA71TN94WQNthl7kFQFPWdwPwHcPw4wPwH7hRA71TN9sztZPhlZXzdRPq16PwHcPw4wPwH7hRA71TN9CJgxjyf94WQNt7Tce7T7L7TcefjfIRjxVW09sqgJXzP9CzlRP7Tce7Tf<7T7L7TceJtfl7Tce7TZ37TceRl9XFlxP7Tc*SgEHvGAewIb7zdRPzI4PwHcPw4wPwH7tJhcPwHcPwj<PwH73T4JwRSAewIb7zdRPzIAe6eAew<PuJ0fsKNcp7Tc*fAb<7Tc*Rt7bW0bpitwPwH2ow1a*wL2*ZLieZG4PwH3<yh7Pit6BRL<x7Tc*JdZVZf8*7Tc*W1ZVZf8*7T7L7Tc*RLZ<wT<p7Tce7TJ<7T7L7TcezSAewGAB6SAt6GAewQZXzh3bJ<kXF0APwHcPwj<PwH7LAkwx6l9CW0Nj7Tce7TJ<7T7L7TcezGAewGAB6SAt6GAewdFPzQRXWPZkiGAewGAB6SAewGAewGAe6eAewd3ezlRkitRTJgcPwHcPwj<PwHcewL2BwL<*ZeAewGAe6eAewdFPzQRXWGAewGAB6SAew4JXzlJsFSAew<PuieDPwHcPw4wPwH7CihbAztfHyN3XygEjWeAewGAB6T2Pw4wPwH7*F0FgygftFh7NzQNGz0f47Tce7TZ3J17kFSAe6eAewQbbWQRtih7P6l9uitfeWQfuit4PwHcPwj<ewIAe6eAewQZXzlCpFAfuig7sFg6PwHcPwjNjWdfP7T7L7Tceih3*6l94FAEbzgAPwHcPwj<PwH7Zztppz0xb7Tce7T7L7Tceih3*TQNCFSAewGAB6SAew4EPJ1ZHih3P7Tce7T7L7Tceih3*fQfeWlPXzGAewGAB6SAewHAuwIAewIbhygE4ztJB7Tc*TP6PwH2xwID*7TZI7Tc*flPuZH6PwjcPwH3DZH6p7Tc*6h3*z0fhFg7vyh6Pw4ikwBWuwBiPwH2oSjbATA*Pw4wPwH3sygCP7Tc*RlfHyl8p7Tc*6lbezlkP7T70wTwevH2uwID*7Tc*AlNQih7p7T70ZTwtvHwl7Tce7T7L7TceW0xbJ0FXWQjPwHcPwj<PwH7hygDBwGAewGAe6eAewd3ezlRkit6PwHcPwj<PwH71FgZrzeAewGAe6eAewdfBFh73FlfuJIAewGAB6SAew4kXqQPsz0<Pw4ikvH2PwH2oflPuF09tWeAew<EA7Tc*wT2uwIAB6GAewNJpzHij7TZI7Tc*qLijKSAew<N*W0xPflfGSlPj7T70ZTwtvHwl7Tc*K<Ccf<kw7T7L7Tc*z0PrFSAew<JPilCXKSAew<ZoWQ9CFSAeRH<BwGD*vH2uwIAewNZbFQNeySAeRHABZeDBZGAewGAe6eAewQxbzQJkigJP7Tce7TZ37TceqQaC6jDPwHcPw4wPwH7Xz4xpzQAPwHcPwjNjWdfP7T7L7TceJlfGF17pJQfe7Tce7TZ3FQNsWlAPw4wPwH7UihFbRgEbiQxPFIAewGAB6gFbz1ZP7T7L7TceF0f*WQfHihRPFN7kz4N46hfHJ0PXz4fuFQ9eilfBSjNuzlEEzgPjqSAewGAB6gFbz1ZP7T7L7TceF0flygZPTgfCzt7E7Tce7TZ3OIAe6eAewQfuJgkPWQNjyg9uTt74FhcPwHcPwj<PZAcPwH7lFgE4zt7TJgcPwHcPw4wPwH7*WQ94JgZjAtfG7Tce7T7L7TceJQfuF09e7Tce7T7L7TcezgNDf09kilb6zlPuJ1wPwHcPw4wPwH7BilbPF1fsygEd7Tce7T7L7TceJhZPW4NHJ0PlihRpzlDPwHcPw4wPwH74zjEXJNReigZr7Tce7T7L7TceFlfXz09HihRpzlDPwHcPw4wPwH7HzlEuFgZjyg9u7Tce7T7L7TceW0xkFlPuWeAewGAe6eAewQkpzgfAqh3PWeAewGAe6eAewd34FPFpFhJPW4fuig7sFg6PwHcPw4wPwH7tFg7ryhRAFgk*zt7bWdPTJ09eigJP7Tce7T7L7TceJlfGylPjA0feWlPBJ0fuJNZjzt7bFlAPwHcPw4wPwH7tygE4ztJLzlEjWQ9sWj9lFh7sih4PwHcPw4wPwH7oih74JlNeFAZXzQZkWd7PzQZE7Tce7T7L7Tceil9XylPPRgEbiQxPFIAewGAe6eAewQN*W<ZXF0fOigkP7Tce7T7L7Tceih3*TQNCFSAewGAe6eAewQN*WNFPWdZpzlDPwHcPw4wPwH7*z0NjFQ9ezSAewGAe6eAewd3ezlRkit6PwHcPw4wPwH7kWlfe6gJPzd6PwHcPw4wPwH7sigEdJgNdFSAewGAe6eAewQxbzQJkigJPWeAewGAe6eAewQ9uT0PuFSAewGAe6eAewdJPiQReyhFPWGAewGAe6eAewQJPJ<Jbzgf*igRB7Tce7T7L7TceyQNliAfuig7sFg6PwHcPw4wPwH7BFgE46Qfbil9u7Tce7T7L7TceJQPGWQNjFSAewGAe6eAewQRPW17PilNjFgRSJgE3F<NkitRpzlENzQFXWQZPWjC3zQ9uqgkpJ14PwHcPw4wPwH7*WQ9jFgZjFgR3JgRpFgEHFSAewGAe6eAewQ7sJgfjzl9jyIAewGAe6eAewdZjzt7bFlfIJgZrFhRB7Tce7T7L7TceilxpW07Xih747Tce7T7L7Tceit7PF0fuJ0Pbz1wPwHcPw4wPwH7rFhPGzlNeFIAewGAe6eAewQkbzQNdFg6PwHcPw4wPwH7CFgRpiARPJQPHFhwPwHcPw4wPwH7BJ09eigJP7Tce7T7L7TceWlfeJQPHFfJXWQCPWGAewGAe6eAewdFpWdRkigxvFhPGzlNeFIAewGAe6eAewdJbylfwzlZr7Tce7T7L7TceF0flygZPTgfCzt7E7Tce7T7L7TceJhZPW4NdFgEjR0NjiSAewGAe6eAewQxXFlPu7Tce7T7L7TceygEr7Tce7T7L7Tcezgf4ygNLih3biQPsyhRpFhwPwHcPw4wPwH74FhFpilf6ztZjJh7P7Tce7T7L7Tcey0P47Tce7T7L7Tcez09HytwPwHcPw4wPwH7dW1APwHcPw4wPwH7CFgRpifZPWtZpzlDPwHcPw4wPwH7*Fh7CyhZByg9uWeAewGAe6eAewd3eFhZPzdRbJ0PXzGAewGAe6eAewdfBiGAewGAe6eAewdbe7Tce7T7L7TceWlfeygNs7Tce7T7L7TceigR3JgZjyg9u6l9CW09uFgEjWeAewGAe6eAewd7kz4N46hfHJ0PXzGAewGAe6eAewQZbz4xXigR3F<NkitRpzlE0FgEHFgR0WQNCFSAewGAe6eAewQZbzPZoih7P7Tce7T7L7TceWlbbWQAPwHcPw4wPwH7Hz0fbW4N*W<7bF0JP7Tce7T7L7TceFlfj6QNjJ0feqSAewGAe6eAewQJPJNfBFh7ZFgRpiSAewGAe6eAewd7PWhfPWtRZSAR76gZHFhZB7Tce7T7L7TceWQfxJgfBJ<kPF0PbSlfEAtPBJ0fC6gZHFhZB7Tce7T7L7TceWlfj6h3*6QN4FlAPwHcPw4wPwH7tFg7ryhR1FhRfWlfeTgf4yg<PwHcPw4wPwH7Hz0fbW49eygJpz4pXygEPF<N4SgEjFh7PWtR1WQ9kW1wPwHcPw4wPwH7HWQfbJ0f3JgZjyg9uTQ9uilAPwHcPw4wPwH7UzlPu6gR7zdRPWQfBJ<Jeztf*7Tce7T7L7Tcez0fbJQf3F<PuJ0feFhZjRt7XJh2PwHcPw4wPwH7kW0RbJ0f3F<PuJ0feFhZjRt7XJh3B7Tce7T7L7TceF0f*WQfHihRPFN7PW0xbilf7zPfSTGAewGAe6eAewQRPW17PilNjFgRfA4EAzkfSTIAewGAe6eAewQJPJ<PuWtRbz0xPFN7Pz0NjFgR3W13B7Tce7T7L7TceFlfjSgEjFh7PWtR1WQ9kW<N46hfHJ0PXz4RbJ0<PwHcPw4wPwH7eFgJpWtRPWP3eztRXil9sS0NuF0xPWGAewGAe6eAewdfuWQfdyhZjFh76WQ9jzlZXz<bbzQRsFhcPwHcPZA6PZj6Pw4wPwH7*7Tce7TZ37TfI7TJI7TcezQNCFSAewGAB6SAewP3<RGAewNFpFhJPWGAewGAtRIAe6eAt6GAewQEbzgAPwHcPwj<PwH7Ly17XzgAPwH36R<iPwH3gygftFhcPwHcPZj6Pw4wPZjcPwH7uigkP7Tce7TZ37Tce6lbezlkpJgjPwH36R<iPwH3gygftFhcPwHcPZj6Pw4wPZjcPwH7uigkP7Tce7TZ37TceTgPHWQ9BzlFj7Tc*RgRdFSAewN3<RGAewNFpFhJPWGAewGAtRIAe6eAt6GAewQEbzgAPwHcPwj<PwH7hFg7vyh6PwH3GJgPsJIkpzGAewN3<RGAewGAtRIAkRIAe6eAewdWPwHcPwj<PZjcPwH74FhFpilf6yhbPzN7bJ0PX7Tce7TZ3wSDeZSAe6eAewdZHWQfPzPRXWIAewGAB6T2Pw4wPwH7Bit7PFgEwFgFj7Tce7TZ3wIAtRIAe6eAewdwPwHcPwj<PZjcPwH7bJQNpz<bPygJoJIAewGAB6TaxZGAe6eAewQNligPsflP4J0aPwHcPwj<xZTwl7T7L7Tceil9szt7<Fh3jyIAewGAB6Tcj7T7L7Tcey0fpFlbj7Tce7TZ3OLij7T7L7TceJlP4J0aPwHcPwj<xZTwl7T7L7TceW0PDFgx<Fh3jyIAewGAB6Tcj7TJ<7T7L7TceWlwPwHcPwj<PZjcPZj6Pw4wPwH7BWeAewGAB6SAt6GAewQZXzlCpFSAewGAB6hReJgAPw4wPwH7szlZbzNZjzt7bFlAPwHcPwjNjWdfP7T7L7TceWlfBWlPXzPZjzt7bFlAPwHcPwjNjWdfP7T7L7TceFlxXiQNsAtRXWQNdFSAewGAB6gFbz1ZP7T7L7TceygE4FhbPF<RI7Tce7TZ3J17kFSAtRIAe6eAewdRm7Tce7TZ3vT6DwIAe6eAewQxpzIAewGAB6SAewGAewGAe6eAewdJpzIAewGAB6SAewGAewGAe6eAewdJp7Tce7TZ37TJI7TceztWPwHcPwj<xZTwl7T7L7TcezlaPwHcPwj<DwTiPw4wPwH7pJeAewGAB6T<kwBiPw4wPwH7pyIAewGAB6TiEZSAe6eAewQfjzGAewGAB6SAewGAk6Q9GyQfHJIAew<fDJ0fezQNs7Tf<7Tce7TJ<7TJ</'
+
+        response = self.get_response(url=url, data=data)
+        resp_json = response.json()
+        self.eid = resp_json["data"]["eid"]
+        self.eid_token = resp_json["data"]["token"]
 
     @staticmethod
     def decrypt_des(encrypted_data: str, key: str, mode: str = 'ECB') -> Union[dict, None]:
