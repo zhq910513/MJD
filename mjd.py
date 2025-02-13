@@ -672,13 +672,13 @@ if __name__ == '__main__':
     _sku_id = "10022039398507"
     # _order_id = "307843863375"
     # _order_id = "310160410437"   # 最新
-    _order_id = "309670376702"  # dd
+    _order_id = "310180189766"  # dd
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
-    mo.run_create()
+    # mo.run_create()
     # mo.run_select()
     # mo.get_sku_info()
     # mo.get_init_order()
-    # mo.get_pay_info_m()
+    mo.get_pay_info_m()
     # mo.get_platWapWXPay()
     # mo.get_checkmweb()
     # mo.generate_device()
