@@ -221,6 +221,7 @@ class MJDBase(object):
         }
         self.refresh_tk_rd()
         self.refresh_wx_tk_rd()
+        self.refresh_eid_eidtoken()
         return ({
                     "r": device["r"],  # 用于加密webglFp/FFA9D23F7A4B3CSS
                     "webglFp": webglFp,
