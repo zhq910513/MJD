@@ -20,5 +20,4 @@ alembic.ini
 *.out
 *.pyc
 logs/
-test_*.py
 *.package
