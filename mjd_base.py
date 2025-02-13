@@ -13,6 +13,7 @@ from Crypto.Cipher import DES
 from Crypto.Util.Padding import unpad
 from curl_cffi import requests
 
+from auto_proxy import get_proxies
 from plugins.redis_ctl import RedisCtrl
 
 
@@ -69,7 +70,7 @@ class MJDBase(object):
         self.js_security_modules = self.init_js_security_modules()
         self.wx_h5st_modules = self.init_wx_h5st_modules()
         self.m_tk_modules = self.init_m_tk_modules()
-        self.proxies = self.get_proxies()
+        self.proxies = get_proxies()
         self.session = None
         self.result = None
         self.tk = None
@@ -324,9 +325,6 @@ class MJDBase(object):
             "card_password": kwargs.get("card_password", None),
         }
         pprint.pprint(self.result)
-
-    def get_proxies(self):
-        return None
 
     def generate_cookies(self):
         cookie_dict = {

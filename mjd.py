@@ -33,7 +33,6 @@ class MJDOrder(MJDBase):
     def get_sku_info(self):
         self.order_id = None
         func_api = "getGameDetailBySkuId"
-        print(func_api)
 
         headers = {
             'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7',
@@ -89,7 +88,6 @@ class MJDOrder(MJDBase):
 
         resp = self.get_response('https://api.m.jd.com/api', params=params)
         resp_json = resp.json()
-        print(resp_json)
 
         if resp_json["code"] == "3":
             log_error(f"查询SKU详情失败 账号不可用：{self.account['pt_pin']}")
@@ -107,7 +105,6 @@ class MJDOrder(MJDBase):
     # 初始化订单
     def get_init_order(self):
         func_api = "submitGPOrder"
-        print(func_api)
 
         headers = {
             'accept': 'application/json, text/plain, */*',
@@ -172,7 +169,6 @@ class MJDOrder(MJDBase):
 
         resp = self.get_response('https://api.m.jd.com/api', data=post_data)
         resp_json = resp.json()
-        print(resp_json)
 
         if not resp_json.get("result"):
             log_error(f"获取初始化订单ID失败：{resp_json}")
@@ -187,7 +183,6 @@ class MJDOrder(MJDBase):
     # 生成订单
     def get_pay_info_m(self):
         func_api = "pay_info_m"
-        print(func_api)
 
         headers = {
             'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7',
@@ -301,14 +296,13 @@ class MJDOrder(MJDBase):
             "openudid": "",
             "uuid": "17393680422681965042898",
             "x-api-eid-token": self.generate_eid_token(),
-            "functionId": "pay_info_m",
+            "functionId": func_api,
             "body": json.dumps(body, separators=(',', ':')),
             "h5st": h5st
         }
 
         resp = self.get_response('https://api.m.jd.com/api', params=params)
         resp_json = resp.json()
-        print(resp_json)
 
         if resp_json["code"] != "0":
             log_error(f"获取支付信息失败：{resp_json}")
@@ -332,7 +326,7 @@ class MJDOrder(MJDBase):
             return self.return_info(code=16)
 
     def get_m_pay(self):
-        print("m_pay")
+        func_api = "m_pay"
         headers = {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             'Accept-Language': 'zh-CN,zh;q=0.9',
@@ -357,13 +351,12 @@ class MJDOrder(MJDBase):
             'appId': self.wx_appid,
             'payId': self.wx_payid,
             'orderId': self.order_id,
-            'tId': 'mpay',
+            'tId': func_api,
         }
         resp = self.get_response('https://mpay.m.jd.com/mpay.dcf1ecf4a58ae843d3e0.html', params=params)
-        print(resp.status_code)
 
     def get_platPayChannel(self):
-        print("platPayChannel")
+        func_api = "platPayChannel"
         headers = {
             'Accept-Language': 'zh-CN,zh;q=0.9',
             'Cache-Control': 'no-cache',
@@ -390,7 +383,7 @@ class MJDOrder(MJDBase):
         api_query_time = int(time.time() * 1000)
 
         params = {
-            'functionId': 'platPayChannel',
+            'functionId': func_api,
             'appid': 'mcashier',
             'scval': 'mpay',
         }
@@ -414,13 +407,11 @@ class MJDOrder(MJDBase):
         }
 
         resp = self.get_response('https://api.m.jd.com/client.action', params=params, data=data)
-        print(resp.status_code)
 
     # 获取支付链接
     def get_platWapWXPay(self):
         url = "https://api.m.jd.com/client.action"
         func_api = "platWapWXPay"
-        print(func_api)
 
         headers = {
             'accept': 'application/json, text/plain, */*',
@@ -475,7 +466,6 @@ class MJDOrder(MJDBase):
 
         resp = self.get_response(url=url, params=params, data=data)
         resp_json = resp.json()
-        print(resp_json)
 
         if not resp_json.get("payInfo"):
             log_error(f"获取微信支付信息失败：{resp_json}")
@@ -494,7 +484,7 @@ class MJDOrder(MJDBase):
 
     # 获取微信支付链接
     def get_checkmweb(self):
-        print("get_wx_paylink")
+        func_api = "get_wx_paylink"
         url = "https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkmweb"
 
         headers = {
@@ -656,12 +646,12 @@ class MJDOrder(MJDBase):
 if __name__ == '__main__':
     _account = {
         # 自己的
-        "pt_pin": "zhq91513",
-        "pt_key": "AAJnrKaVADChKF-KgRvGcEk7VPe_YVZhcoNuzwgpeZfRLxz07Tg58KCpxB3WXCBz-T63lC4Oxqk",
+        # "pt_pin": "zhq91513",
+        # "pt_key": "AAJnrKaVADChKF-KgRvGcEk7VPe_YVZhcoNuzwgpeZfRLxz07Tg58KCpxB3WXCBz-T63lC4Oxqk",
         # "pt_key": "AAJnpCesADAxbvctVtaJQCr6aM0FUC1rYjxpt6aTC-5HxhmU4L7qKEg8_sK2ivOwbyXa69uQecs",   # edge
         # dd
-        # "pt_pin": "jd_LpHciKLtISJq",
-        # "pt_key": "AAJnq3jyADDAhz0RzzMqk9LLGx3yIkDeyBCDXF1eerGEnVF8gSD7zdyT0epX6es_HhuXXk36CEg",
+        "pt_pin": "jd_LpHciKLtISJq",
+        "pt_key": "AAJnq3jyADDAhz0RzzMqk9LLGx3yIkDeyBCDXF1eerGEnVF8gSD7zdyT0epX6es_HhuXXk36CEg",
         # 不可用
         # "pt_pin": "jd_COXQQFzqpVtW",
         # "pt_key": "AAJnizbmADBmgx2zKBZzOQiDzfAc_w1YKJLckIau5lN_X04_CKVIbVL8_ap-mR-B4Ua92l02SHY",
@@ -674,9 +664,9 @@ if __name__ == '__main__':
         # "pt_key": "AAJnqIOxADBwwHNjWLxHiCnfwL4FR5C9z0AN6bi0ITiyIdQosATybvZoZ1qoYI0GMP-QvXX4vmI",
     }
     _sku_id = "10022039398507"
-    _order_id = "307843863375"
-    # _order_id = "309697133745"
-    # _order_id = "309670376702"  # dd
+    # _order_id = "307843863375"
+    # _order_id = "310160410437"   # 最新
+    _order_id = "309670376702"  # dd
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
     # mo.run_create()
     mo.run_select()
@@ -686,4 +676,3 @@ if __name__ == '__main__':
     # mo.get_platWapWXPay()
     # mo.get_checkmweb()
     # mo.generate_device()
-    # print(mo.generate_wx_h5st(int(time.time() * 1000)))

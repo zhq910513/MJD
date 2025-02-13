@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# 代理账号 芝麻代理
+# 代理账号
+PROXY_API = "http://theking123.user.xiecaiyun.com/api/proxies?action=getJSON&key=NP1BC2826B&count=1&word=&rand=true&norepeat=true&detail=true&ltime=240&idshow=true"
+PROXY_USR = "TheKing123"
+PROXY_PWD = "TheKing123"
 
 
 # 验证码服务商账号
