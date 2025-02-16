@@ -672,12 +672,11 @@ class MJDOrder(MJDBase):
 if __name__ == '__main__':
     _account = {
         # 自己的
-        "pt_pin": "zhq91513",
-        "pt_key": "AAJnrKaVADChKF-KgRvGcEk7VPe_YVZhcoNuzwgpeZfRLxz07Tg58KCpxB3WXCBz-T63lC4Oxqk",
-        # "pt_key": "AAJnpCesADAxbvctVtaJQCr6aM0FUC1rYjxpt6aTC-5HxhmU4L7qKEg8_sK2ivOwbyXa69uQecs",   # edge
+        # "pt_pin": "zhq91513",
+        # "pt_key": "AAJnrKaVADChKF-KgRvGcEk7VPe_YVZhcoNuzwgpeZfRLxz07Tg58KCpxB3WXCBz-T63lC4Oxqk",   # edge
         # dd
-        # "pt_pin": "jd_LpHciKLtISJq",
-        # "pt_key": "AAJnq3jyADDAhz0RzzMqk9LLGx3yIkDeyBCDXF1eerGEnVF8gSD7zdyT0epX6es_HhuXXk36CEg",
+        "pt_pin": "jd_LpHciKLtISJq",
+        "pt_key": "AAJnq3jyADDAhz0RzzMqk9LLGx3yIkDeyBCDXF1eerGEnVF8gSD7zdyT0epX6es_HhuXXk36CEg",
         # 不可用
         # "pt_pin": "jd_COXQQFzqpVtW",
         # "pt_key": "AAJnizbmADBmgx2zKBZzOQiDzfAc_w1YKJLckIau5lN_X04_CKVIbVL8_ap-mR-B4Ua92l02SHY",
@@ -691,15 +690,15 @@ if __name__ == '__main__':
     }
     _sku_id = "10022039398507"
     # _order_id = "307843863375"
-    _order_id = "310194090018"  # 最新
-    # _order_id = "309670376702"  # dd
+    # _order_id = "310303029922"  # 最新
+    _order_id = "310313674634"  # dd
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
-    # mo.generate_webglFp()
+    # print(mo.generate_webglFp())
     # mo.run_create()
-    # mo.run_select()
+    mo.run_select()
     # mo.get_sku_info()
     # mo.get_init_order()
-    mo.get_pay_info_m()
+    # mo.get_pay_info_m()
     # mo.get_platWapWXPay()
     # mo.get_checkmweb()
     # mo.generate_device()

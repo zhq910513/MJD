@@ -42,5 +42,5 @@ if __name__ == '__main__':
         "order_id": "307843863375",  # 已支付
         # "order_id": "310160410437",   # 待支付
     }
-    # test_select()
-    test_create()
+    test_select()
+    # test_create()
