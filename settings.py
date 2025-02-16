@@ -17,4 +17,4 @@ REDIS_DB = 0
 REDIS_PASS = ""
 
 # 安装环境依赖
-# pip install -r requirements.txt -i https://pypi.douban.com/simple
+# pip install -r requirements.txt
