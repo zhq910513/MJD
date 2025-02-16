@@ -91,107 +91,65 @@ def download_sprite_image(resp):
     load(_url)
 
 
-def get_distance(original, jigsaw):
-    def base64_to_image(base64_str):
-        img_data = base64.b64decode(base64_str)
-        nparr = np.frombuffer(img_data, np.uint8)
-        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        return img, img_rgb
+def get_distance(image_path):
+    """
+    计算验证码图片中缺口到左侧边缘的距离,并绘制缺口轮廓
+    :param image_path:
+    图片路径 :
+    return: 缺口到左侧边缘的距离
+    """
+    # 1. 加载图片
+    image = cv2.imread(image_path)
+    if image is None:
+        raise ValueError("图片加载失败,请检查路径是否正确")
 
-    # 转换图片
-    background, background_rgb = base64_to_image(original)
-    slider, slider_rgb = base64_to_image(jigsaw)
+    # 2. 灰度化
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    def preprocess_image(image):
-        # 灰度化
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # 3. 高斯模糊,减少噪声
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
 
-        # 高斯模糊
-        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    # 4. 边缘检测
+    edges = cv2.Canny(blurred, threshold1=50, threshold2=150)
 
-        # 边缘检测
-        edges = cv2.Canny(blurred, 50, 150)
+    # 5. 轮廓检测
+    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        # 形态学操作(开运算去除小干扰点)
-        kernel = np.ones((3, 3), np.uint8)
-        processed = cv2.morphologyEx(edges, cv2.MORPH_OPEN, kernel)
+    # 6. 过滤轮廓,找到缺口
+    gap_contour = None
+    max_area = 0
+    for contour in contours:
+        # 计算轮廓面积
+        area = cv2.contourArea(contour)
+        # 过滤掉面积过小的轮廓
+        if area < 100:
+            continue
+        # 找到面积最大的轮廓
+        if area > max_area:
+            max_area = area
+            gap_contour = contour
 
-        return processed
+    if gap_contour is None:
+        raise ValueError("未检测到缺口")
 
-    def find_shapes(image):
-        # 预处理图像
-        processed = preprocess_image(image)
+    # 7. 计算缺口的最左侧点
+    leftmost_point = tuple(gap_contour[gap_contour[:, :, 0].argmin()][0])
 
-        # 查找轮廓
-        contours, _ = cv2.findContours(processed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # 8. 计算距离
+    gap_distance = leftmost_point[0]
 
-        # 提取形状
-        shapes = []
-        for contour in contours:
-            x, y, w, h = cv2.boundingRect(contour)
-            shapes.append((x, y, w, h))
+    # 9. 绘制缺口轮廓
+    cv2.drawContours(image, [gap_contour], -1, (0, 255, 0), 1)  # 绿色轮廓,线宽为2
 
-        return shapes
+    # 10. 标记最左侧点
+    cv2.circle(image, leftmost_point, 5, (0, 0, 255), -1)  # 红色圆点标记最左侧点
 
-    def match_shape(background, slider):
-        # 预处理背景图和滑块图
-        background_processed = preprocess_image(background)
-        slider_processed = preprocess_image(slider)
+    # 11. 显示结果图片
+    cv2.imshow("Result", image)
+    cv2.waitKey(0)  # 等待按键
+    cv2.destroyAllWindows()  # 关闭所有窗口
 
-        # 多尺度匹配
-        scales = [0.8, 1.0, 1.2, 1.5, 2.0]
-        best_match = None
-        best_confidence = 0
-
-        for scale in scales:
-            # 缩放滑块图
-            scaled_slider = cv2.resize(slider_processed, None, fx=scale, fy=scale)
-            h, w = scaled_slider.shape
-
-            # 模板匹配
-            result = cv2.matchTemplate(background_processed, scaled_slider, cv2.TM_CCOEFF_NORMED)
-
-            # 获取匹配结果
-            _, max_val, _, max_loc = cv2.minMaxLoc(result)
-
-            # 更新最佳匹配
-            if max_val > best_confidence:
-                best_confidence = max_val
-                best_match = (max_loc[0], max_loc[1], w, h, scale)
-
-        return best_match, best_confidence
-
-    # 1. 识别滑块图中的所有图形,并用轮廓标记
-    slider_shapes = find_shapes(slider)
-    slider_marked = slider_rgb.copy()
-    for (x, y, w, h) in slider_shapes:
-        cv2.rectangle(slider_marked, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-    # 显示滑块图中的图形
-    cv2.imshow("Shapes in Slider Image", slider_marked)
-    cv2.waitKey(0)
-
-    # 2. 在背景图上找到缺口,并标记
-    best_match, best_confidence = match_shape(background, slider)
-    if best_match and best_confidence > 0.5:  # 置信度阈值
-        match_x, match_y, w, h, scale = best_match
-
-        # 在背景图上绘制缺口轮廓
-        background_marked = background_rgb.copy()
-        cv2.rectangle(background_marked, (match_x, match_y), (match_x + w, match_y + h), (0, 255, 0), 2)
-
-        # 显示背景图上的缺口
-        cv2.imshow("Gap in Background Image", background_marked)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
-        # 3. 返回距离
-        distance = match_x
-        return distance
-    else:
-        print("未找到匹配的缺口位置")
-        return None
+    return gap_distance
 
 
 def image_to_base64(image_path):
@@ -223,7 +181,7 @@ def image_to_base64(image_path):
 bg_base64 = image_to_base64("image_1.png")
 jg_base64 = image_to_base64("image_0.png")
 
-print(get_distance(bg_base64, jg_base64))
+print(get_distance("image_1.png"))
 
 # load("https://t.captcha.qq.com/cap_union_new_getcapbysig?img_index=1&image=02bd270000fb883f0000000bb5d1ac9e32bb&sess=s0WQX03uQUOxrHUH4MRNzpiJdI4Jqi_vdpydFnYPmvZHx7X3lNPHfoV1tStDwnBvXaJyNd_hFyDVmzO6hekaHe8QCUw3cMq7lGHXl5h9-qZQfRarAd9z17Yytp3sdlfHs8OU_ea_lJOdsKP3oNxdvj-ti6oHKgZ71xm2j3AD5j9BT0ja-ivt33aKubUIn2DmRzlG1WkDrETC_Epq_IvNJ67CyfYv0M_Fb2OBNGOiFCXaVegHU3drbNE47PgaPXCwkTclxJkO2vd1IkG_rxb_WH0Esu_OLhMA6iOkQqbeULOEGc1yhdEyxPVzPxmspnxdquxAAjSb2Ig2S9tQeESZagiQPl3wfw4qBzXrCjnGirmvK4rR7VmKZZ2-3r4pKOCr_ZvyOF2V20uxRd5HnrGkehmE2C1tsodMS-7B2MVKfQDK8cmXohlcmCGixV3E6eqEbmoTKgxOBjnDsGome-S8yB9Pz2hp-owlqTNANtyNsw3g2QxwLOIZWpFax7Skm0XK2ViNwo4N2_szDSgd1uJB84D7kBtGSdlDOS8qc1qzzrrHU*")
 
