@@ -692,7 +692,11 @@ var ParamsSign = function () {
         },
         _$W = _$F.hircv(_$D, dz(0x249) == typeof globalThis && globalThis) || _$D(dz(0x249) == typeof window && window) || _$F.LGYlA(_$D, dz(0x249) == typeof self && self) || _$D(dz(0x249) == typeof _$h && _$h) || _$F.pPprn(_$D, _$F.WjzCi == typeof _$h && _$h) || function () {
             return this;
-        }() || Function(dz(0x166))(), _$V = _$a, _$M = Function.prototype, _$q = _$M.apply, _$Y = _$M.call,
+        }() || Function(dz(0x166))(),
+        _$V = _$a,
+        _$M = Function.prototype,
+        _$q = _$M.apply,
+        _$Y = _$M.call,
         _$s = dz(0x249) == typeof Reflect && Reflect.apply || (_$V ? _$Y.bind(_$q) : function () {
             return _$Y.apply(_$q, arguments);
         }), _$d = _$l, _$r = _$d({}.toString), _$A = _$d(''.slice), _$w = function (_$da) {
