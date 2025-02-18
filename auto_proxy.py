@@ -38,13 +38,11 @@ def get_proxies(retry=1):
                     else:
                         return None
         else:
-            if "访问频率过快惩罚截止时间" in resp.json().get("message"):
-                print(resp.json().get("message"))
-            else:
-                print(resp.json())
+            print(resp.json())
             return None
     except Exception as error:
         print(error)
+        return None
 
 
 def check_proxies(ip_info):
@@ -53,3 +51,6 @@ def check_proxies(ip_info):
     if response.status_code == 200:
         return True
     return False
+
+
+print(get_proxies())

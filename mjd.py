@@ -12,7 +12,7 @@ from plugins.log import log_error
 
 
 class MJDOrder(MJDBase):
-    def __init__(self, account, sku_id, order_id=None):
+    def __init__(self, account, sku_id=None, order_id=None):
         super().__init__(account=account, order_id=order_id)
         self.get_account_setting()
         self.sku_id = sku_id
@@ -552,14 +552,16 @@ class MJDOrder(MJDBase):
                     return self.return_info(code=18, error_msg=error_msg)
 
             if "验证码加载失败，请稍后重试" in resp_text:
-                print("--- 遇到验证码 ---")
+                # print("--- 遇到验证码 ---")
                 captcha_id = \
                     re.findall(r"TencentCaptcha\(document.getElementById\('captcha-view'\),'(\d+)'", resp_text)[0]
-                print(captcha_id)
+                # print(captcha_id)
 
                 # cap_union_prehandle
                 # cap_union_new_verify
                 # checkcaptcha
+
+                return self.return_info(code=17)
 
     # 查询
     def get_order_detail(self):
@@ -672,30 +674,30 @@ class MJDOrder(MJDBase):
 if __name__ == '__main__':
     _account = {
         # 自己的
-        # "pt_pin": "zhq91513",
-        # "pt_key": "AAJnrKaVADChKF-KgRvGcEk7VPe_YVZhcoNuzwgpeZfRLxz07Tg58KCpxB3WXCBz-T63lC4Oxqk",   # edge
-        # # dd
-        "pt_pin": "jd_LpHciKLtISJq",
-        "pt_key": "AAJnq3jyADDAhz0RzzMqk9LLGx3yIkDeyBCDXF1eerGEnVF8gSD7zdyT0epX6es_HhuXXk36CEg",
-        # # 不可用
-        # # "pt_pin": "jd_COXQQFzqpVtW",
-        # # "pt_key": "AAJnizbmADBmgx2zKBZzOQiDzfAc_w1YKJLckIau5lN_X04_CKVIbVL8_ap-mR-B4Ua92l02SHY",
-        # # "pt_pin": "jd_gAUwsCxtALiG",
-        # # "pt_key": "AAJniTWmADDf4Ar2uJqYIJfqWfwv6xzHI6mZSX-Fp3B1dsBsTwlSoRf49JBzaUFINvCeSRN9xI8",
-        # # 可用批量
-        # # "pt_pin": "jd_qUJbtnjwQSWs",
-        # # "pt_key": "AAJnqIOxADBpd0N6wfgyDZG-YB7EENeOzKBu6zcY0WFZTIw02_2Q9XH_jKIjqbP5z27fsWlNI9w",
-        # # "pt_pin": "jd_TjWNdaxBXkMw",
-        # # "pt_key": "AAJnqIOxADBwwHNjWLxHiCnfwL4FR5C9z0AN6bi0ITiyIdQosATybvZoZ1qoYI0GMP-QvXX4vmI",
+        "pt_pin": "zhq91513",
+        "pt_key": "AAJnrKaVADChKF-KgRvGcEk7VPe_YVZhcoNuzwgpeZfRLxz07Tg58KCpxB3WXCBz-T63lC4Oxqk",   # edge
+        # # # dd
+        # "pt_pin": "jd_LpHciKLtISJq",
+        # "pt_key": "AAJnq3jyADDAhz0RzzMqk9LLGx3yIkDeyBCDXF1eerGEnVF8gSD7zdyT0epX6es_HhuXXk36CEg",
+        # # # 不可用
+        # # # "pt_pin": "jd_COXQQFzqpVtW",
+        # # # "pt_key": "AAJnizbmADBmgx2zKBZzOQiDzfAc_w1YKJLckIau5lN_X04_CKVIbVL8_ap-mR-B4Ua92l02SHY",
+        # # # "pt_pin": "jd_gAUwsCxtALiG",
+        # # # "pt_key": "AAJniTWmADDf4Ar2uJqYIJfqWfwv6xzHI6mZSX-Fp3B1dsBsTwlSoRf49JBzaUFINvCeSRN9xI8",
+        # # # 可用批量
+        # # # "pt_pin": "jd_qUJbtnjwQSWs",
+        # # # "pt_key": "AAJnqIOxADBpd0N6wfgyDZG-YB7EENeOzKBu6zcY0WFZTIw02_2Q9XH_jKIjqbP5z27fsWlNI9w",
+        # # # "pt_pin": "jd_TjWNdaxBXkMw",
+        # # # "pt_key": "AAJnqIOxADBwwHNjWLxHiCnfwL4FR5C9z0AN6bi0ITiyIdQosATybvZoZ1qoYI0GMP-QvXX4vmI",
     }
     _sku_id = "10022039398507"
     # _order_id = "307843863375"
     _order_id = "310303029922"  # 最新
-    # _order_id = "310313674634"  # dd
-    mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
+    # _order_id = "309756850294"  # dd
+    mo = MJDOrder(account=_account, order_id=_order_id)
     # print(mo.generate_device())
     # mo.run_create()
-    # mo.run_select()
+    mo.run_select()
     # mo.get_sku_info()
     # mo.get_init_order()
     # mo.get_pay_info_m()
