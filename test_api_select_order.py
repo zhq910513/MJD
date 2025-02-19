@@ -24,7 +24,6 @@ if __name__ == '__main__':
             "pt_pin": "zhq91513",  # 替换你的账号
             "pt_key": "AAJnrKaVADChKF-KgRvGcEk7VPe_YVZhcoNuzwgpeZfRLxz07Tg58KCpxB3WXCBz-T63lC4Oxqk"  # 替换你的账号
         },
-        "sku_id": "10022039398507",
         "order_id": "307843863375",  # 已支付
     }
     test_select()
