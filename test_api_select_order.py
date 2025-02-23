@@ -1,4 +1,5 @@
 # encoding: utf-8
+import pprint
 
 from curl_cffi import requests
 
@@ -12,7 +13,7 @@ def test_select():
 
     # 打印响应
     if response.status_code == 200:
-        print("请求成功：", response.json())
+        pprint.pp(response.json())
     else:
         print(f"请求失败, 状态码: {response.status_code}, 错误信息: {response.text}")
 
@@ -24,6 +25,6 @@ if __name__ == '__main__':
             "pt_pin": "zhq91513",  # 替换你的账号
             "pt_key": "AAJnrKaVADChKF-KgRvGcEk7VPe_YVZhcoNuzwgpeZfRLxz07Tg58KCpxB3WXCBz-T63lC4Oxqk"  # 替换你的账号
         },
-        "order_id": "307843863375",  # 已支付
+        "order_id": "309906639807",  # 已支付
     }
     test_select()

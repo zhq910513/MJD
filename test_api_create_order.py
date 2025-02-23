@@ -12,7 +12,7 @@ def test_create():
 
     # 打印响应
     if response.status_code == 200:
-        print("请求成功：", response.json())
+        print(response.json())
     else:
         print(f"请求失败，状态码: {response.status_code}, 错误信息: {response.text}")
 
