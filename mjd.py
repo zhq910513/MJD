@@ -29,6 +29,12 @@ class MJDOrder(MJDBase):
     def handle_post_data(post_data):
         return urlencode(post_data).replace("%2A", "*").replace("%27", "%22").replace("+", "")
 
+    @staticmethod
+    def handle_get_data(post_data):
+        return urlencode(post_data).replace("%2A", "*").replace("%27", "%22").replace("+", "").replace("%3A",
+                                                                                                       ":").replace(
+            "%2C", ",")
+
     # 获取SKU详情
     def get_sku_info(self):
         self.order_id = None
@@ -68,6 +74,12 @@ class MJDOrder(MJDBase):
         }
         body_str = self.generate_body_str(body)
 
+        # 合成clt的设备参数
+        input_clt_str = self.generate_clt_str()
+
+        # 签名
+        h5st = self.generate_h5st(js_v, device_info=self.device_info, func_api=func_api, input_clt_str=input_clt_str,
+                                  api_query_time=api_query_time, body_str=body_str)
         params = {
             'appid': 'tsw-m',
             'functionId': func_api,
@@ -75,20 +87,11 @@ class MJDOrder(MJDBase):
             'body': json.dumps(body, separators=(',', ':')),
             'uuid': self.device_info["uuid"],
             'screen': self.device_info["base"]["screen"]["screen"],
+            'h5st': h5st,
             'x-api-eid-token': self.device_info["eid_token"]
         }
 
-        # 合成clt的设备参数
-        input_clt_str = self.generate_clt_str()
-
-        # 签名
-        h5st = self.generate_h5st(js_v, device_info=self.device_info, func_api=func_api, input_clt_str=input_clt_str,
-                                  api_query_time=api_query_time, body_str=body_str)
-        params.update({
-            'h5st': h5st
-        })
-
-        resp = self.get_response('https://api.m.jd.com/api', params=params)
+        resp = self.get_response(url='https://api.m.jd.com/api', params=params)
         resp_json = resp.json()
         print(resp_json)
 
@@ -103,7 +106,7 @@ class MJDOrder(MJDBase):
         self.brand_id = resp_json["result"]["brandId"]
         self.sku_price = resp_json["result"]["skuPrice"]
         self.sku_type = resp_json["result"]["type"]
-        # self.get_init_order()
+        self.get_init_order()
 
     # 初始化订单
     def get_init_order(self):
@@ -688,10 +691,10 @@ if __name__ == '__main__':
         # # # "pt_key": "AAJnqIOxADBwwHNjWLxHiCnfwL4FR5C9z0AN6bi0ITiyIdQosATybvZoZ1qoYI0GMP-QvXX4vmI",
     }
     _sku_id = "10022039398507"
-    _order_id = "307843863375"
-    # _order_id = "309906639807"  # 最新
+    # _order_id = "307843863375"
+    _order_id = "309906639807"  # 最新
     # _order_id = "309756850294"  # dd
-    mo = MJDOrder(account=_account, order_id=_order_id)
+    mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
     # print(mo.generate_device())
     mo.run_create()
     # mo.run_select()
