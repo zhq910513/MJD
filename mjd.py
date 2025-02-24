@@ -605,16 +605,6 @@ class MJDOrder(MJDBase):
         }
         body_str = self.generate_body_str(body)
 
-        post_data = {
-            'appid': 'tsw-m',
-            'functionId': func_api,
-            't': str(api_query_time),
-            'body': json.dumps(body, separators=(',', ':')),
-            'uuid': self.device_info["uuid"],
-            'screen': self.device_info["base"]["screen"]["screen"],
-            'x-api-eid-token': self.device_info["eid_token"]
-        }
-
         # 合成clt的设备参数
         input_clt_str = self.generate_clt_str()
 
@@ -622,9 +612,16 @@ class MJDOrder(MJDBase):
         h5st = self.generate_h5st(js_v, device_info=self.device_info, func_api=func_api, input_clt_str=input_clt_str,
                                   api_query_time=api_query_time, body_str=body_str)
 
-        post_data.update({
-            'h5st': h5st
-        })
+        post_data = {
+            'appid': 'tsw-m',
+            'functionId': func_api,
+            't': str(api_query_time),
+            'body': json.dumps(body, separators=(',', ':')),
+            'uuid': self.device_info["uuid"],
+            'screen': self.device_info["base"]["screen"]["screen"],
+            'h5st': h5st,
+            'x-api-eid-token': self.device_info["eid_token"],
+        }
         post_data = self.handle_post_data(post_data)
 
         resp = self.get_response('https://api.m.jd.com/api', data=post_data)
@@ -674,11 +671,11 @@ class MJDOrder(MJDBase):
 if __name__ == '__main__':
     _account = {
         # 自己的
-        # "pt_pin": "zhq91513",
-        # "pt_key": "AAJnrKaVADChKF-KgRvGcEk7VPe_YVZhcoNuzwgpeZfRLxz07Tg58KCpxB3WXCBz-T63lC4Oxqk",  # edge
+        "pt_pin": "zhq91513",
+        "pt_key": "AAJnrKaVADChKF-KgRvGcEk7VPe_YVZhcoNuzwgpeZfRLxz07Tg58KCpxB3WXCBz-T63lC4Oxqk",  # edge
         # dd
-        "pt_pin": "jd_LpHciKLtISJq",
-        "pt_key": "AAJnq3jyADDAhz0RzzMqk9LLGx3yIkDeyBCDXF1eerGEnVF8gSD7zdyT0epX6es_HhuXXk36CEg",
+        # "pt_pin": "jd_LpHciKLtISJq",
+        # "pt_key": "AAJnq3jyADDAhz0RzzMqk9LLGx3yIkDeyBCDXF1eerGEnVF8gSD7zdyT0epX6es_HhuXXk36CEg",
         # # # 不可用
         # # # "pt_pin": "jd_COXQQFzqpVtW",
         # # # "pt_key": "AAJnizbmADBmgx2zKBZzOQiDzfAc_w1YKJLckIau5lN_X04_CKVIbVL8_ap-mR-B4Ua92l02SHY",
@@ -691,9 +688,9 @@ if __name__ == '__main__':
         # # # "pt_key": "AAJnqIOxADBwwHNjWLxHiCnfwL4FR5C9z0AN6bi0ITiyIdQosATybvZoZ1qoYI0GMP-QvXX4vmI",
     }
     _sku_id = "10022039398507"
-    # _order_id = "307843863375"
+    _order_id = "307843863375"
     # _order_id = "309906639807"  # 最新
-    _order_id = "309756850294"  # dd
+    # _order_id = "309756850294"  # dd
     mo = MJDOrder(account=_account, order_id=_order_id)
     # print(mo.generate_device())
     mo.run_create()
