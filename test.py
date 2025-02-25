@@ -1,64 +1,9 @@
 import json
 
-from curl_cffi import requests
-from urllib.parse import urlencode, unquote
+a = '{\n  "wc": 0,\n  "wd": 0,\n  "l": "zh-CN",\n  "ls": "zh-CN,zh,en,ko",\n  "ml": 2,\n  "pl": 5,\n  "av": "5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",\n  "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",\n  "sua": "Windows NT 10.0; Win64; x64",\n  "pp": {\n    "p1": "zhq91513"\n  },\n  "extend": {\n    "wd": 0,\n    "l": 0,\n    "ls": 5,\n    "wk": 0,\n    "bu1": "0.1.5",\n    "bu2": 0,\n    "bu3": 38,\n    "bu4": 0,\n    "bu5": 0,\n    "bu6": 4,\n    "bu7": 0,\n    "bu8": 0,\n    "bu10": 6\n  },\n  "pp1": "",\n  "bu1": "Error: test err\\n    at HTMLDocument._$Be [as querySelector] (https://storage.360buyimg.com/webcontainer/js_security_v3_0.1.5.js:5:8455)\\n    at https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:12099:25\\n    at Array.map (<anonymous>)\\n    at preload (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:12084:27)\\n    at https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:12129:45\\n    at T$1 (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:239:10)\\n    at Vk (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:6943:14)\\n    at Uk (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:6599:12)\\n    at Tk (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:6592:5)\\n    at Ik (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:6575:7)",\n  "w": 1536,\n  "h": 864,\n  "ow": 1536,\n  "oh": 816,\n  "url": "https://recharge.m.jd.com/orderDetail?orderId=307843863375&serviceType=3&source=41",\n  "og": "https://recharge.m.jd.com",\n  "pf": "Win32",\n  "pr": 1.25,\n  "re": "",\n  "random": "iash4NOlGtq",\n  "referer": "",\n  "v": "h5_file_v5.0.8",\n  "bu2": "    at https://storage.360buyimg.com/webcontainer/js_security_v3_0.1.5.js:5:77867",\n  "bu3": "function Window() { [native code] }$function toString() { [native code] }",\n  "canvas": "0fb7f119e21bb6b17b2b0d333a5617bf",\n  "canvas1": "0fb7f119e21bb6b17b2b0d333a5617bf",\n  "webglFp": "9ef6901beacde53c5b05944cce35c114",\n  "webglFp1": "9ef6901beacde53c5b05944cce35c114",\n  "ccn": 20,\n  "ai": "73806",\n  "fp": "pawcrd9pss9p9s28",\n  "wk": -1\n}'
+
+print(json.loads(a))
 
 
-def handle_post_data(post_data):
-    return urlencode(post_data).replace("%2A", "*").replace("%27", "%22").replace("+", "").replace("%3A", ":").replace("%2C", ",")
-
-
-cookies = {
-    'pt_key': 'AAJnpJozADAjZd8TJAQjJAk4hJDaveKHCIU3lN7FHKi8s0AFdjFBr_ax9PcAs9AcRK8xVg1plSw',
-    'pt_pin': 'zhq91513',
-}
-
-headers = {
-    'accept': 'application/json, text/plain, */*',
-    'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7',
-    'cache-control': 'no-cache',
-    'origin': 'https://recharge.m.jd.com',
-    'pragma': 'no-cache',
-    'priority': 'u=1, i',
-    'referer': 'https://recharge.m.jd.com/',
-    'sec-ch-ua': '"Not(A:Brand";v="99", "Google Chrome";v="133", "Chromium";v="133"',
-    'sec-ch-ua-mobile': '?0',
-    'sec-ch-ua-platform': '"Windows"',
-    'sec-fetch-dest': 'empty',
-    'sec-fetch-mode': 'cors',
-    'sec-fetch-site': 'same-site',
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
-    'x-referer-page': 'https://recharge.m.jd.com/cardSettlement',
-    'x-rp-client': 'h5_1.0.0',
-    # 'cookie': 'mba_muid=17388405838361203117691; shshshfpa=9ee2cd02-57f9-72c5-f778-0351f1e1997b-1735542848; shshshfpx=9ee2cd02-57f9-72c5-f778-0351f1e1997b-1735542848; jcap_dvzw_fp=BBa_tQvhLIA1_N6io9arxprmrEgwD4yO3js6hJx_BwYhiKMLmUQGL48plfjERVlfbko3rOnLW4KZd2LmUAmdpQ==; TrackerID=j6Y1xjLelmeAYTWyVhfOmwoTBWNJiGcOiYeqGh3jC5-hDZ-uGogPTYRJXtBKFae8lIwR4DiVxw48dXzRf0ROSNwZmaxnSsPPHo-wfMRL2ig; pt_key=AAJnpJozADAjZd8TJAQjJAk4hJDaveKHCIU3lN7FHKi8s0AFdjFBr_ax9PcAs9AcRK8xVg1plSw; pt_pin=zhq91513; pt_token=yo4fvkms; pwdt_id=zhq91513; whwswswws=; retina=0; webp=1; visitkey=8719492081381946543; 3AB9D23F7A4B3C9B=6GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQ; sc_width=1536; cid=9; wxa_level=1; jxsid=17403791741774565469; __jdv=122270672%7Cdirect%7C-%7Cnone%7C-%7C1740379174272; __jdc=122270672; appCode=ms0ca95114; autoOpenApp_downCloseDate_jd_homePage=1740391715652_1; cd_eid=jdd036GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQAAAAMVG5WLUYQAAAAACQJBBANWH3FFEAX; __jda=122270672.17388405838361203117691.1738840583.1740383523.1740394437.32; jxsid_s_u=https%3A//trade.m.jd.com/order/orderlist_jdm.shtml; jxsid_s_t=1740394620354; warehistory="10022039398507,10022039398507,10022039398507,10022039398507,10022039398507,10022039398507,10022039398507,10022039398507,10022039398507,10022039398507,10022039398507,"; wqmnx1=MDEyNjM2MnRpLm0vYT9kMjg4MjEzbCBvICA7IFcvNk1ra3IzLmE3MXNkYTIyT0QpJkg%3D; autoOpenApp_downCloseDate_autoOpenApp_autoPromptly=1740394658805_1; __wga=1740394659729.1740394659729.1740391208372.1739326616108.1.7; PPRD_P=UUID.17388405838361203117691-LOGID.1740394659743.1552446414; shshshfpb=BApXSppWTNPBAFGMSpb6ccUWxaiZKJyihBncVL2dj9xJ1OsZTbN-Hx0u4ZQPoNOY; __jdb=122270672.10.17388405838361203117691|32.1740394437; 3AB9D23F7A4B3CSS=jdd036GW2Z3HU2M3GXJOWMDRZJG5OASMRDUS3MHOPOX6AIX6N7R2PH4MYVOHA2OK2MS3CDPEWHKTDG6K6Q6TR4IX4PVYMNQAAAAMVG6UQZ6IAAAAADXT2P3ENS52H64X; _gia_d=1; pt_st=1_bY4sZfXxGlc0XvY-d0pCQ_GB9XOj9gUsNjWIGL4MTAh_3A4W1VpT8VKO0vMqMVksHzv1vSNl5WlCzWu0WAMofcXaeEJ2-9oeE0NyNWzWcOKEO6pjacshHbWxFaISXFNuYk3_jVaUT4E-Fcd_Xm5_gSVX1wVt-pUS52l-z8KvvNrkZ91E0tfx6jNL7T56if8qIW0trVPAlLUWcDTfE7oc1DPje8fqvq**; mba_sid=1740394437375203116020341365.16',
-}
-
-body = {
-    "skuId": "10022039398507",
-    "appKey": "android",
-    "source": 41
-}
-
-params = {
-    'appid': 'tsw-m',
-    'functionId': 'getGameDetailBySkuId',
-    't': '1740414896423',
-    'body': json.dumps(body, separators=(',', ':')),
-    'uuid': '1739290819705591564465',
-    'screen': '2160*1440',
-    'h5st': '20250225003456441;rsrrrrr3a9pxdc70;8e94a;tk03w91ea1c5c18ngdX5Bhw407DM7KDXSctS9nls_AfWiNGgyxI4M4imeFXW-_Vv2KTUSGFA6hFKtymKevK1buffygsd;300750ad8d97322442e6b5cb0f9604687cac009693103fbe2b171b92b351c87e;5.0;1740414896441;WNpZcw5Rp9mB14S9gVjNnQy9nQi9nQXRfRX9zQXR5xZOhZ3L3hjB2QXR5xZO3ZGNgBjMhJWAl92B242Np9WN1UDN08WM2Q2A30GN0MGB3Z3L3ZyIt8zB08yR5Z3XtR3A38GNjFGBmNmN1Y2BnRjMoRzM3QDNnFDLoV2AiRzApRXRfRn94Ay_4MzR5Z3XtRXLrZ2OkBiC0oD-zcEMxQXRfR383ZXRPp3Ri5yDvoFN-4WHqIzR5x2RscTArUz93ZXRPp3RnN2_w80R5x2RzYyR5Z3XtlSR5x5M5x2RpVG83QXR5ZXRPpXN5x2RhFyB3ZXR5Z3XtZWRfRnMkQzR5ZXR5xZOlZ3L3BG83QXR5ZXRPpXN5x2RkFyB3ZXR5Z3XtZWRfRXMkQzR5ZXR5xZOiFWRfRnNkQzR5ZXR5xZOnlXRfR3NkQzR5ZXR5xZO3F2OohXN3Z3L3VG83QXR5ZXRPpXN5x2Ru8yR5ZXR5xZOkZ3L3NS_3ZXR5Z3XtZWRfRX_3ZXR5Z3XtZWRfRXAiQXR5ZXRPtSRfRXArET8hEzR5Z3XtlSR5x5RowlFQISGO0jBRYSG6Iz-3Z3L3VW93ZXR5Z3XeY3L3ZS93ZXRPp3RlBW75tWMjhD-CYnLphXNoZXELYn9icTAr0jE3Z3L3VD8mQXR5xp7;5c6e06f38466ae729828211de83678a5f6157494cf9526bee23cbd17d237ba38',
-    'x-api-eid-token': 'jdd03YRDWQFZXJRLQMUEO57SOHM2R7XUQJSJQ5FUBGN6XGD3WR3N6LJXGHM23OO7Q5426D5VBMSTIO4NSPVTTFS5Z55OSZAAAAAMVHDHRB6AAAAAACOUQPL6BD2SXA4X'
-}
-print(params)
-
-
-response = requests.get(
-    'https://api.m.jd.com/api',
-    cookies=cookies,
-    headers=headers,
-    params=params
-)
-print(response.json())
-
-# {'appid': 'tsw-m', 'functionId': 'getGameDetailBySkuId', 't': '1740417649895', 'body': '{"skuId":null,"appKey":"android","source":41}', 'uuid': '17388405838361203117691', 'screen': '2160*1440', 'h5st': '20250225012050159;rsrrrrr3a9pxdc70;8e94a;tk03wf80b1e1318nWGe3p8vwpqZc9gi1ldcx7BcGizhYMpmaYqwca_YkBLBrjogv-ethLudoJrGZJ_8-X5pZokGjos2_;44ea327018f23ed08de5428e5c95f3a8585660136d990864eed05c1e40dd233c;5.0;1740417650159;WNpZcw5Rp9mB14S9gVjNnQy9nQi9nQXRfRX9zQXR5xZOhZ3L3hjB2QXR5xZO3ZGNgBjMhJWAl92B242Np9WN1UDN08WM2Q2A30GN0MGB3Z3L3ZyIt8zB08yR5Z3XtR3A38GNjFGBmNmN1Y2BnRjMoRzM3QDNnFDLoV2AiRzApRXRfRn94Ay_4MzR5Z3XtRXLrZ2OkBiC0oD-zcEMxQXRfR383ZXRPp3RmMC8lBGE1I1G-c183Z3L3lj_1gDBnQXR5xZO3RmNr0jE3Z3L3BT93ZXRPpH65Z3XjZ3L3ZGNkQzR5ZXR5xZOpZ3L35G83QXR5ZXRPpXN5x2RiFyB3ZXR5Z3XtJWRfR3MkQzR5ZXR5xZOpZ3L3FG83QXR5ZXRPpXN5x2RlFyB3ZXR5Z3XtJGM5x2RmFyB3ZXR5Z3XtZWRfR3NkQzR5ZXR5xZO3F2OohXN3Z3L3VG83QXR5ZXRPpXN5x2Ru8yR5ZXR5xZOkZ3L3NS_3ZXR5Z3XtZWRfRX_3ZXR5Z3XtZWRfRXAiQXR5ZXRPtSRfRXArET8hEzR5Z3XtlSR5x5RowlFQISGO0jBRYSG6Iz-3Z3L3VW93ZXR5Z3XeY3L3ZS93ZXRPp3RlBW75tWMjhD-CYnLphXNoZXELYn9icTAr0jE3Z3L3VD8mQXR5xp7;59e2aa44ebdb26dff35882ae84d7e804f5c4f9373fea13700fd92f4558cbf707', 'x-api-eid-token': 'jdd03YRDWQFZXJRLQMUEO57SOHM2R7XUQJSJQ5FUBGN6XGD3WR3N6LJXGHM23OO7Q5426D5VBMSTIO4NSPVTTFS5Z55OSZAAAAAMVHDHRB6AAAAAACOUQPL6BD2SXA4X'}
-# {'appid': 'tsw-m', 'functionId': 'getGameDetailBySkuId', 't': '1740414896423', 'body': '{"skuId":"10022039398507","appKey":"android","source":41}', 'uuid': '1739290819705591564465', 'screen': '2160*1440', 'h5st': '20250225003456441;rsrrrrr3a9pxdc70;8e94a;tk03w91ea1c5c18ngdX5Bhw407DM7KDXSctS9nls_AfWiNGgyxI4M4imeFXW-_Vv2KTUSGFA6hFKtymKevK1buffygsd;300750ad8d97322442e6b5cb0f9604687cac009693103fbe2b171b92b351c87e;5.0;1740414896441;WNpZcw5Rp9mB14S9gVjNnQy9nQi9nQXRfRX9zQXR5xZOhZ3L3hjB2QXR5xZO3ZGNgBjMhJWAl92B242Np9WN1UDN08WM2Q2A30GN0MGB3Z3L3ZyIt8zB08yR5Z3XtR3A38GNjFGBmNmN1Y2BnRjMoRzM3QDNnFDLoV2AiRzApRXRfRn94Ay_4MzR5Z3XtRXLrZ2OkBiC0oD-zcEMxQXRfR383ZXRPp3Ri5yDvoFN-4WHqIzR5x2RscTArUz93ZXRPp3RnN2_w80R5x2RzYyR5Z3XtlSR5x5M5x2RpVG83QXR5ZXRPpXN5x2RhFyB3ZXR5Z3XtZWRfRnMkQzR5ZXR5xZOlZ3L3BG83QXR5ZXRPpXN5x2RkFyB3ZXR5Z3XtZWRfRXMkQzR5ZXR5xZOiFWRfRnNkQzR5ZXR5xZOnlXRfR3NkQzR5ZXR5xZO3F2OohXN3Z3L3VG83QXR5ZXRPpXN5x2Ru8yR5ZXR5xZOkZ3L3NS_3ZXR5Z3XtZWRfRX_3ZXR5Z3XtZWRfRXAiQXR5ZXRPtSRfRXArET8hEzR5Z3XtlSR5x5RowlFQISGO0jBRYSG6Iz-3Z3L3VW93ZXR5Z3XeY3L3ZS93ZXRPp3RlBW75tWMjhD-CYnLphXNoZXELYn9icTAr0jE3Z3L3VD8mQXR5xp7;5c6e06f38466ae729828211de83678a5f6157494cf9526bee23cbd17d237ba38', 'x-api-eid-token': 'jdd03YRDWQFZXJRLQMUEO57SOHM2R7XUQJSJQ5FUBGN6XGD3WR3N6LJXGHM23OO7Q5426D5VBMSTIO4NSPVTTFS5Z55OSZAAAAAMVHDHRB6AAAAAACOUQPL6BD2SXA4X'}
+'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36'
+'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36'
