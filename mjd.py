@@ -697,8 +697,8 @@ if __name__ == '__main__':
     _order_id = "309756850294"  # dd
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
     # print(mo.generate_device())
-    # mo.run_create()
-    mo.run_select()
+    mo.run_create()
+    # mo.run_select()
     # mo.get_sku_info()
     # mo.get_init_order()
     # mo.get_pay_info_m()
