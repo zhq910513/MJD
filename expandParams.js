@@ -1,18 +1,18 @@
 // 定位点  var _$Be = _$gf.encode(_$gK.parse(_$Bw));
 
 
-a = {
+_$Bw = {
   "wc": 0,
   "wd": 0,
   "l": "zh-CN",
-  "ls": "zh-CN,zh,en,ko",
+  "ls": "zh-CN,en,en-GB,en-US",
   "ml": 2,
   "pl": 5,
-  "av": "5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
-  "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
+  "av": "5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0",
+  "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0",
   "sua": "Windows NT 10.0; Win64; x64",
   "pp": {
-    "p1": "jd_LpHciKLtISJq"
+    "p1": "zhq91513"
   },
   "extend": {
     "wd": 0,
@@ -30,28 +30,28 @@ a = {
     "bu10": 6
   },
   "pp1": "",
-  "bu1": "Error: test err\n    at HTMLDocument._$Be [as querySelector] (https://storage.360buyimg.com/webcontainer/js_security_v3_0.1.5.js:5:8455)\n    at y (https://storage.360buyimg.com/jsresource/jcap/version/v1.2.3/captcha_mobile_2025_02_21.q5omn1.min.js:20:71401)\n    at v (https://storage.360buyimg.com/jsresource/jcap/version/v1.2.3/captcha_mobile_2025_02_21.q5omn1.min.js:20:71223)\n    at p (https://storage.360buyimg.com/jsresource/jcap/version/v1.2.3/captcha_mobile_2025_02_21.q5omn1.min.js:20:70705)\n    at Object.a117 (https://storage.360buyimg.com/jsresource/jcap/version/v1.2.3/captcha_mobile_2025_02_21.q5omn1.min.js:22:15604)\n    at n (https://storage.360buyimg.com/jsresource/jcap/version/v1.2.3/captcha_mobile_2025_02_21.q5omn1.min.js:1:326)\n    at Object.c65d (https://storage.360buyimg.com/jsresource/jcap/version/v1.2.3/captcha_mobile_2025_02_21.q5omn1.min.js:29:31518)\n    at n (https://storage.360buyimg.com/jsresource/jcap/version/v1.2.3/captcha_mobile_2025_02_21.q5omn1.min.js:1:326)\n    at Module.cd49 (https://storage.360buyimg.com/jsresource/jcap/version/v1.2.3/captcha_mobile_2025_02_21.q5omn1.min.js:48:156318)\n    at n (https://storage.360buyimg.com/jsresource/jcap/version/v1.2.3/captcha_mobile_2025_02_21.q5omn1.min.js:1:326)",
-  "w": 1440,
-  "h": 960,
-  "ow": 1440,
-  "oh": 912,
-  "url": "https://recharge.m.jd.com/orderDetail?orderId=310802557546&serviceType=3&source=41",
+  "bu1": "Error: test err\n    at HTMLDocument._$Be [as querySelector] (https://storage.360buyimg.com/webcontainer/js_security_v3_0.1.5.js:5:8455)\n    at https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:12099:25\n    at Array.map (<anonymous>)\n    at preload (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:12084:27)\n    at https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:12129:45\n    at T$1 (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:239:10)\n    at Vk (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:6943:14)\n    at Uk (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:6599:12)\n    at Tk (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:6592:5)\n    at Ik (https://storage.360buyimg.com/dlxt/recharge/2d8254d/assets/index-0487cad1.js:6575:7)",
+  "w": 1536,
+  "h": 864,
+  "ow": 1536,
+  "oh": 816,
+  "url": "https://recharge.m.jd.com/orderDetail?orderId=307843863375&serviceType=3&source=41",
   "og": "https://recharge.m.jd.com",
   "pf": "Win32",
-  "pr": 1.5,
-  "re": "https://trade.m.jd.com/",
-  "random": "BYFuJ2ANfb_",
-  "referer": "https://trade.m.jd.com/",
+  "pr": 1.25,
+  "re": "",
+  "random": "2NyWoRDKl3N",
+  "referer": "",
   "v": "h5_file_v5.0.8",
   "bu2": "    at https://storage.360buyimg.com/webcontainer/js_security_v3_0.1.5.js:5:77867",
   "bu3": "function Window() { [native code] }$function toString() { [native code] }",
   "canvas": "0fb7f119e21bb6b17b2b0d333a5617bf",
   "canvas1": "0fb7f119e21bb6b17b2b0d333a5617bf",
-  "webglFp": "a3e19bf2c47e1ad07028cb74d487f910",
-  "webglFp1": "a3e19bf2c47e1ad07028cb74d487f910",
-  "ccn": 8,
+  "webglFp": "9ef6901beacde53c5b05944cce35c114",
+  "webglFp1": "9ef6901beacde53c5b05944cce35c114",
+  "ccn": 20,
   "ai": "8e94a",
-  "fp": "rsrrrrr3a9pxdc70",
+  "fp": "9pwppps3rxdapwa2",
   "wk": -1
 }
 
