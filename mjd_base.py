@@ -14,7 +14,7 @@ from Crypto.Cipher import DES
 from Crypto.Util.Padding import unpad
 from curl_cffi import requests
 
-from auto_proxy import get_proxies
+# from auto_proxy import get_proxies
 from plugins.log import log_error
 from plugins.redis_ctl import RedisCtrl
 
@@ -77,8 +77,8 @@ class MJDBase(object):
         self.js_3015_security_modules = self.init_js_3015_security_modules()
         self.wx_h5st_modules = self.init_wx_h5st_modules()
         self.m_tk_modules = self.init_m_tk_modules()
-        self.proxies = get_proxies()
-        # self.proxies = None
+        # self.proxies = get_proxies()
+        self.proxies = None
         self.session = None
         self.result = None
         self.tk = None
@@ -313,7 +313,10 @@ class MJDBase(object):
         self.redis.set(self.redis_account_order_key, self.order_id, ex=60 * 60 * 24 * 1)
 
     def redis_update_account(self, field, value):
-        _cache = json.loads(self.redis.get(self.redis_key))
+        redis_cache = self.redis.get(self.redis_key)
+        if not redis_cache:
+            return
+        _cache = json.loads(redis_cache)
         if _cache:
             _cache[field] = value
 

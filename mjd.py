@@ -630,6 +630,7 @@ class MJDOrder(MJDBase):
 
         resp = self.get_response('https://api.m.jd.com/api', data=post_data)
         resp_json = resp.json()
+        print(resp_json)
 
         if resp_json.get("errorCode") == "31":
             return self.return_info(code=19)
@@ -678,11 +679,11 @@ if __name__ == '__main__':
         # "pt_pin": "zhq91513",
         # "pt_key": "AAJnrKaVADChKF-KgRvGcEk7VPe_YVZhcoNuzwgpeZfRLxz07Tg58KCpxB3WXCBz-T63lC4Oxqk",  # edge
         # dd
-        "pt_pin": "jd_LpHciKLtISJq",
-        "pt_key": "AAJnq3jyADDAhz0RzzMqk9LLGx3yIkDeyBCDXF1eerGEnVF8gSD7zdyT0epX6es_HhuXXk36CEg",
-        # # # 不可用
-        # # # "pt_pin": "jd_COXQQFzqpVtW",
-        # # # "pt_key": "AAJnizbmADBmgx2zKBZzOQiDzfAc_w1YKJLckIau5lN_X04_CKVIbVL8_ap-mR-B4Ua92l02SHY",
+        # "pt_pin": "jd_LpHciKLtISJq",
+        # "pt_key": "AAJnq3jyADDAhz0RzzMqk9LLGx3yIkDeyBCDXF1eerGEnVF8gSD7zdyT0epX6es_HhuXXk36CEg",
+        # 不可用
+        "pt_pin": "jd_COXQQFzqpVtW",
+        "pt_key": "AAJnizbmADBmgx2zKBZzOQiDzfAc_w1YKJLckIau5lN_X04_CKVIbVL8_ap-mR-B4Ua92l02SHY",
         # # # "pt_pin": "jd_gAUwsCxtALiG",
         # # # "pt_key": "AAJniTWmADDf4Ar2uJqYIJfqWfwv6xzHI6mZSX-Fp3B1dsBsTwlSoRf49JBzaUFINvCeSRN9xI8",
         # # # 可用批量
