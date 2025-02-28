@@ -1,6 +1,8 @@
 import base64
-import numpy as np
+
 import cv2
+import numpy as np
+from PIL import Image
 from curl_cffi import requests
 
 headers = {
@@ -65,7 +67,7 @@ def load(url):
         'sec-ch-ua-platform': '"Windows"',
     }
     response = requests.get(url=url, headers=_headers)
-    with open('captcha.png', 'wb') as f:
+    with open('image_sg_full.png', 'wb') as f:
         f.write(response.content)
 
 
@@ -85,71 +87,10 @@ def download_bg_image(resp):
     load(_url)
 
 
-def download_sprite_image(resp):
+def download_sg_image(resp):
     _url = "https://t.captcha.qq.com" + resp["data"]["dyn_show_info"]["sprite_url"]
     print(_url)
     load(_url)
-
-
-def get_distance(image_path):
-    """
-    计算验证码图片中缺口到左侧边缘的距离,并绘制缺口轮廓
-    :param image_path:
-    图片路径 :
-    return: 缺口到左侧边缘的距离
-    """
-    # 1. 加载图片
-    image = cv2.imread(image_path)
-    if image is None:
-        raise ValueError("图片加载失败,请检查路径是否正确")
-
-    # 2. 灰度化
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-    # 3. 高斯模糊,减少噪声
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-
-    # 4. 边缘检测
-    edges = cv2.Canny(blurred, threshold1=50, threshold2=150)
-
-    # 5. 轮廓检测
-    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    # 6. 过滤轮廓,找到缺口
-    gap_contour = None
-    max_area = 0
-    for contour in contours:
-        # 计算轮廓面积
-        area = cv2.contourArea(contour)
-        # 过滤掉面积过小的轮廓
-        if area < 100:
-            continue
-        # 找到面积最大的轮廓
-        if area > max_area:
-            max_area = area
-            gap_contour = contour
-
-    if gap_contour is None:
-        raise ValueError("未检测到缺口")
-
-    # 7. 计算缺口的最左侧点
-    leftmost_point = tuple(gap_contour[gap_contour[:, :, 0].argmin()][0])
-
-    # 8. 计算距离
-    gap_distance = leftmost_point[0]
-
-    # 9. 绘制缺口轮廓
-    cv2.drawContours(image, [gap_contour], -1, (0, 255, 0), 1)  # 绿色轮廓,线宽为2
-
-    # 10. 标记最左侧点
-    cv2.circle(image, leftmost_point, 5, (0, 0, 255), -1)  # 红色圆点标记最左侧点
-
-    # 11. 显示结果图片
-    cv2.imshow("Result", image)
-    cv2.waitKey(0)  # 等待按键
-    cv2.destroyAllWindows()  # 关闭所有窗口
-
-    return gap_distance
 
 
 def image_to_base64(image_path):
@@ -169,19 +110,119 @@ def image_to_base64(image_path):
     return base64_str
 
 
-# response = requests.get('https://t.captcha.qq.com/cap_union_prehandle', params=params, headers=headers)
-# resp_json = json.loads(response.text[1:-1])
-# pprint.pp(resp_json)
+def get_distance(bg, sg):
+    def base64_to_image(base64_str):
+        img_data = base64.b64decode(base64_str)
+        nparr = np.frombuffer(img_data, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        return img, img_rgb
 
-# download_bg_image(resp_json)
-# download_sprite_image(resp_json)
-# sess = resp_json["sess"]
-# init_pos = get_init_pos(resp_json)
+    # 转换图片
+    background, background_rgb = base64_to_image(bg)
+    slider, slider_rgb = base64_to_image(sg)
 
-bg_base64 = image_to_base64("image_1.png")
-jg_base64 = image_to_base64("image_0.png")
+    def get_position_at_scale(background, slider, scale):
+        # 放大图片
+        scaled_background = cv2.resize(background, None, fx=scale, fy=scale)
+        scaled_slider = cv2.resize(slider, None, fx=scale, fy=scale)
 
-print(get_distance("image_1.png"))
+        # 图片预处理
+        background_blur = cv2.GaussianBlur(scaled_background, (3, 3), 0)
+        slider_blur = cv2.GaussianBlur(scaled_slider, (3, 3), 0)
 
-# load("https://t.captcha.qq.com/cap_union_new_getcapbysig?img_index=1&image=02bd270000fb883f0000000bb5d1ac9e32bb&sess=s0WQX03uQUOxrHUH4MRNzpiJdI4Jqi_vdpydFnYPmvZHx7X3lNPHfoV1tStDwnBvXaJyNd_hFyDVmzO6hekaHe8QCUw3cMq7lGHXl5h9-qZQfRarAd9z17Yytp3sdlfHs8OU_ea_lJOdsKP3oNxdvj-ti6oHKgZ71xm2j3AD5j9BT0ja-ivt33aKubUIn2DmRzlG1WkDrETC_Epq_IvNJ67CyfYv0M_Fb2OBNGOiFCXaVegHU3drbNE47PgaPXCwkTclxJkO2vd1IkG_rxb_WH0Esu_OLhMA6iOkQqbeULOEGc1yhdEyxPVzPxmspnxdquxAAjSb2Ig2S9tQeESZagiQPl3wfw4qBzXrCjnGirmvK4rR7VmKZZ2-3r4pKOCr_ZvyOF2V20uxRd5HnrGkehmE2C1tsodMS-7B2MVKfQDK8cmXohlcmCGixV3E6eqEbmoTKgxOBjnDsGome-S8yB9Pz2hp-owlqTNANtyNsw3g2QxwLOIZWpFax7Skm0XK2ViNwo4N2_szDSgd1uJB84D7kBtGSdlDOS8qc1qzzrrHU*")
+        # 转换为灰度图
+        background_gray = cv2.cvtColor(background_blur, cv2.COLOR_BGR2GRAY)
+        slider_gray = cv2.cvtColor(slider_blur, cv2.COLOR_BGR2GRAY)
 
+        # 边缘检测
+        background_edges = cv2.Canny(background_gray, 100, 200)
+        slider_edges = cv2.Canny(slider_gray, 100, 200)
+
+        # 模板匹配
+        result = cv2.matchTemplate(background_edges, slider_edges, cv2.TM_CCOEFF_NORMED)
+
+        # 使用亚像素级别的匹配
+        _, max_val, _, max_loc = cv2.minMaxLoc(result)
+
+        # 在最大值周围进行插值，获取更精确的位置
+        if 0 < max_loc[0] < result.shape[1] - 1:
+            # 获取最大值左右的点
+            left_val = result[max_loc[1]][max_loc[0] - 1]
+            center_val = result[max_loc[1]][max_loc[0]]
+            right_val = result[max_loc[1]][max_loc[0] + 1]
+
+            # 使用抛物线插值计算亚像素级别的位置
+            delta = 0.5 * (left_val - right_val) / (left_val - 2 * center_val + right_val)
+            target_x = max_loc[0] + delta
+        else:
+            target_x = max_loc[0]
+
+        # 将结果缩放回原始尺寸
+        return target_x / scale, max_val
+
+    # 使用多个缩放尺度进行匹配
+    scales = [1.0, 1.5, 2.0]  # 可以调整缩放倍数
+    positions = []
+    confidences = []
+
+    for scale in scales:
+        pos, conf = get_position_at_scale(background, slider, scale)
+        positions.append(pos)
+        confidences.append(conf)
+
+    # 使用置信度作为权重计算加权平均位置
+    weighted_sum = sum(p * c for p, c in zip(positions, confidences))
+    weight_sum = sum(confidences)
+    final_x = weighted_sum / weight_sum if weight_sum > 0 else positions[0]
+
+    # 在原图上标记匹配位置（用于调试）
+    slider_height, slider_width = slider.shape[:2]
+    result_img = background_rgb.copy()
+    cv2.rectangle(result_img,
+                  (int(final_x), 0),  # Y 轴起始位置为 self.init_y
+                  (int(final_x + slider_width), 0 + slider_height),
+                  # Y 轴结束位置为 self.init_y + slider_height
+                  (0, 255, 0), 2)  # 绿色矩形框，线宽为 2
+
+    # 保存标记后的图片
+    cv2.imwrite("image_mark.png", cv2.cvtColor(result_img, cv2.COLOR_RGB2BGR))
+
+    return int(final_x - 0.5) - 2  # 保留3位小数
+
+
+def cut_image():
+    """
+    裁剪图片的某个正方形位置。
+
+    参数:
+        image_path (str): 输入图片的路径。
+        output_path (str): 裁剪后图片的保存路径。
+        x (int): 正方形左上角的横坐标。
+        y (int): 正方形左上角的纵坐标。
+        size (int): 正方形的边长。
+    """
+    x = 142
+    y = 490
+    size = 120
+
+    # 打开图片
+    image = Image.open("image_sg_full.png")
+
+    # 检查裁剪区域是否超出图片范围
+    if x + size > image.width or y + size > image.height:
+        raise ValueError("裁剪区域超出图片范围！")
+
+    # 裁剪图片
+    cropped_image = image.crop((x, y, x + size, y + size))
+
+    # 保存裁剪后的图片
+    cropped_image.save("image_sg.png")
+
+
+# load("https://t.captcha.qq.com/cap_union_new_getcapbysig?img_index=0&image=02bd27000000000e0000000bb9ec09cf3836&sess=s0HEW_1vV7hPOcxEGv55jnGGXJHhRv7lUgpmE79TncviPnNTDM7bIZ8fd8xWOyNHpSzaRJvjZhIOiWlorI0fFtNbJSDpuzMiwMgGbOkJq3mO6LUYGVh3O-oY3YQn7XmIwUYXJot2YpHqxhdrnBAHXrm0hPiqzBwlAjeDhEEwjpFIgiDJ-hQ0qbHFOHJAJMtgsSJYhUHu_tOagX0VmB2H0LD2dkeKec2wmdTD8X7C2jgkTmUhFKCdbPAXC6rC8drM1SkNqstd9MFUSZOYRNQX09euOTdhnRIUKr0TwqDNsSkhTmdcVxUzMXgzptZkz5HgX0cyZaXvlq3RBzUnIrPH5RrgvooRcxMjMQWcCrD3GMawy77n3WxhDxW9nrj8xkW1TnKiroCrf6nTeinD0Jiv1ICrnD6XK4uMD4Y40zV1H9xnY9Lq3PwKfVV-b9Q67qQSMN_gPhp53khlH3QrXOmyW9dBL9PT3_iTNNfN3szzH-iZls1Q_RInxcd16XePi1ULUk4MhH56FvXEvIF-gOAYwoEyVizC2MhnmHKcJubEJFLOh7jjEvHYDKIQ**")
+
+# cut_image()
+_bg = image_to_base64("image_bg.png")
+_sg = image_to_base64("image_sg.png")
+print(get_distance(_bg, _sg))
