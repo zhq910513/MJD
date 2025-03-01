@@ -77,8 +77,8 @@ class MJDBase(object):
         self.js_3015_security_modules = self.init_js_3015_security_modules()
         self.wx_h5st_modules = self.init_wx_h5st_modules()
         self.m_tk_modules = self.init_m_tk_modules()
-        # self.proxies = get_proxies()
-        self.proxies = None
+        self.proxies = get_proxies()
+        # self.proxies = None
         self.session = None
         self.result = None
         self.tk = None

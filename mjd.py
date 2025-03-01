@@ -852,7 +852,7 @@ class MJDOrder(MJDBase):
         # 保存标记后的图片
         cv2.imwrite("image_mark.png", cv2.cvtColor(result_img, cv2.COLOR_RGB2BGR))
 
-        self.distance =  int(final_x - 0.5) - 2  # 保留3位小数
+        self.distance = int(final_x - 0.5) - 2  # 保留3位小数
 
     # 校验验证结果
     def checkcaptcha(self, randstr, ticket):
@@ -1017,9 +1017,9 @@ if __name__ == '__main__':
     }
     _sku_id = "10022039398507"
     # _order_id = "307843863375"
-    # _order_id = "310735636654"  # 最新
+    # _order_id = "310961315560"  # 最新
     # _order_id = "309756850294"  # dd
-    _order_id = "310891808577"   # 新号
+    _order_id = "310170016279"   # 新号
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
     # print(mo.generate_device())
     # mo.run_create()
