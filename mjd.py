@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
+import base64
 import json
 import random
 import re
 import time
 from urllib.parse import urlencode
 
-from mjd_base import MJDBase
-from plugins.log import log_error
 import cv2
 import numpy as np
-import base64
 from PIL import Image
+
+from mjd_base import MJDBase
+from plugins.log import log_error
+
+
 # 列表   https://trade.m.jd.com/order/orderlist_jdm.shtml?sceneval=2&jxsid=17405644484247143825&appCode=ms0ca95114&orderType=all&ptag=7155.1.11&source=m_inner_myJd.orderFloor_orderlist
 # 查询链接   https://recharge.m.jd.com/orderDetail?orderId=307843863375&serviceType=3&source=41
 
@@ -566,7 +569,8 @@ class MJDOrder(MJDBase):
 
             if "验证码加载失败，请稍后重试" in resp_text:
                 print("--- 遇到验证码 ---")
-                self.captcha_id = re.findall(r"TencentCaptcha\(document.getElementById\('captcha-view'\),'(\d+)'", resp_text)[0]
+                self.captcha_id = \
+                re.findall(r"TencentCaptcha\(document.getElementById\('captcha-view'\),'(\d+)'", resp_text)[0]
                 self.cap_union_prehandle()
                 self.get_cap_union_new_verify()
 
@@ -1006,27 +1010,27 @@ class MJDOrder(MJDBase):
 if __name__ == '__main__':
     _account = {
         # 自己的
-        # "pt_pin": "zhq91513",
-        # "pt_key": "AAJnrKaVADChKF-KgRvGcEk7VPe_YVZhcoNuzwgpeZfRLxz07Tg58KCpxB3WXCBz-T63lC4Oxqk",
+        "pt_pin": "zhq91513",
+        "pt_key": "AAJnrKaVADChKF-KgRvGcEk7VPe_YVZhcoNuzwgpeZfRLxz07Tg58KCpxB3WXCBz-T63lC4Oxqk",
         # dd
         # "pt_pin": "jd_LpHciKLtISJq",
         # "pt_key": "AAJnq3jyADDAhz0RzzMqk9LLGx3yIkDeyBCDXF1eerGEnVF8gSD7zdyT0epX6es_HhuXXk36CEg",
         # 新号
-        "pt_pin": "jd_5b204cf6a28eb",
-        "pt_key": "AAJnsyNnADC8QWPgMFGP4Vp4_H-WXKXal6QV7iYB7HSDil-kvFYr2Oq2J0zu_KLgYhss1GfNZSA",
+        # "pt_pin": "jd_5b204cf6a28eb",
+        # "pt_key": "AAJnsyNnADC8QWPgMFGP4Vp4_H-WXKXal6QV7iYB7HSDil-kvFYr2Oq2J0zu_KLgYhss1GfNZSA",
     }
     _sku_id = "10022039398507"
     # _order_id = "307843863375"
-    # _order_id = "310961315560"  # 最新
+    # _order_id = "311046751626"  # 最新
     # _order_id = "309756850294"  # dd
-    _order_id = "310170016279"   # 新号
+    _order_id = "310170016279"  # 新号
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
     # print(mo.generate_device())
-    # mo.run_create()
+    mo.run_create()
     # mo.run_select()
     # mo.get_sku_info()
     # mo.get_init_order()
-    mo.get_pay_info_m()
+    # mo.get_pay_info_m()
     # mo.get_platWapWXPay()
     # mo.get_checkmweb()
     # mo.generate_device()
