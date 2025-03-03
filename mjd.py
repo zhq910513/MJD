@@ -112,6 +112,10 @@ class MJDOrder(MJDBase):
             log_error(f"查询SKU详情失败 账号不可用：{self.account['pt_pin']}")
             return self.return_info(code=0)
 
+        if resp_json.get("errorCode") == "10001":
+            log_error(f"账号rd/tk/eid风控：{resp_json}")
+            return self.return_info(code=19, err_msg="账号rd/tk/eid风控")
+
         if not resp_json.get("result"):
             log_error(f"获取SKU {self.sku_id} 详情失败：{resp_json}")
             return self.return_info(code=2)
@@ -192,13 +196,17 @@ class MJDOrder(MJDBase):
         resp_json = resp.json()
         print(resp_json)
 
-        if not resp_json.get("result"):
+        if not resp_json.get("result") or not resp_json["result"].get("orderId"):
             log_error(f"获取初始化订单ID失败：{resp_json}")
             return self.return_info(code=3)
 
         if resp_json.get("errorCode") == "31":
             log_error(f"获取初始化订单ID被风控：{resp_json}")
             return self.return_info(code=19)
+
+        if resp_json.get("errorCode") == "10001":
+            log_error(f"账号rd/tk/eid风控：{resp_json}")
+            return self.return_info(code=19, err_msg="账号rd/tk/eid风控")
 
         self.order_id = resp_json["result"]["orderId"]
 
@@ -570,7 +578,7 @@ class MJDOrder(MJDBase):
             if "验证码加载失败，请稍后重试" in resp_text:
                 print("--- 遇到验证码 ---")
                 self.captcha_id = \
-                re.findall(r"TencentCaptcha\(document.getElementById\('captcha-view'\),'(\d+)'", resp_text)[0]
+                    re.findall(r"TencentCaptcha\(document.getElementById\('captcha-view'\),'(\d+)'", resp_text)[0]
                 self.cap_union_prehandle()
                 self.get_cap_union_new_verify()
 
@@ -969,9 +977,14 @@ class MJDOrder(MJDBase):
         if resp_json.get("errorCode") == "31":
             return self.return_info(code=19)
 
+        if resp_json.get("errorCode") == "10001":
+            log_error(f"账号rd/tk/eid风控：{resp_json}")
+            return self.return_info(code=19, err_msg="账号rd/tk/eid风控")
+
         if resp_json["code"] == "3":
             log_error(f"查询订单详情失败 账号不可用：{self.account['pt_pin']}")
             return self.return_info(code=0)
+
         if not resp_json.get("result"):
             log_error(f"查询订单详情失败 订单ID：{self.order_id} 返回数据：{resp_json}")
             return self.return_info(code=6)
@@ -1010,14 +1023,14 @@ class MJDOrder(MJDBase):
 if __name__ == '__main__':
     _account = {
         # 自己的
-        "pt_pin": "zhq91513",
-        "pt_key": "AAJnrKaVADChKF-KgRvGcEk7VPe_YVZhcoNuzwgpeZfRLxz07Tg58KCpxB3WXCBz-T63lC4Oxqk",
+        # "pt_pin": "zhq91513",
+        # "pt_key": "AAJnrKaVADChKF-KgRvGcEk7VPe_YVZhcoNuzwgpeZfRLxz07Tg58KCpxB3WXCBz-T63lC4Oxqk",
         # dd
         # "pt_pin": "jd_LpHciKLtISJq",
         # "pt_key": "AAJnq3jyADDAhz0RzzMqk9LLGx3yIkDeyBCDXF1eerGEnVF8gSD7zdyT0epX6es_HhuXXk36CEg",
         # 新号
-        # "pt_pin": "jd_5b204cf6a28eb",
-        # "pt_key": "AAJnsyNnADC8QWPgMFGP4Vp4_H-WXKXal6QV7iYB7HSDil-kvFYr2Oq2J0zu_KLgYhss1GfNZSA",
+        "pt_pin": "jd_5b204cf6a28eb",
+        "pt_key": "AAJnsyNnADC8QWPgMFGP4Vp4_H-WXKXal6QV7iYB7HSDil-kvFYr2Oq2J0zu_KLgYhss1GfNZSA",
     }
     _sku_id = "10022039398507"
     # _order_id = "307843863375"
