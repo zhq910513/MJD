@@ -32,6 +32,8 @@ class MJDOrder(MJDBase):
         self.wx_package = None
         self.wx_prepay_id = None
         self.captcha_id = "2093769752"
+        self.tdc_link = None
+        self.captcha_md5 = None
         self.prefix = None
         self.sess = None
         self.distance = 0
@@ -626,6 +628,12 @@ class MJDOrder(MJDBase):
         self.session.headers.clear()
         self.session.headers.update(headers)
 
+        def get_tdc_link(resp):
+            self.tdc_link = 'https://turing.captcha.qcloud.com' + resp["data"]["comm_captcha_cfg"]["tdc_path"]
+
+        def get_captcha_md5(resp):
+            self.captcha_md5 = resp["data"]["comm_captcha_cfg"]["pow_cfg"]["md5"]
+
         def get_prefix(resp):
             self.prefix = resp["data"]["comm_captcha_cfg"]["pow_cfg"]["prefix"]
 
@@ -689,11 +697,11 @@ class MJDOrder(MJDBase):
             cropped_image.save("image_sg.png")
 
         params = {
-            'aid': '2093769752',
+            'aid': self.captcha_id,
             'protocol': 'https',
             'accver': '1',
             'showtype': 'embed',
-            'ua': 'TW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEzMi4wLjAuMCBTYWZhcmkvNTM3LjM2',
+            'ua': self.decrypt_base64(self.device["useragent"]),
             'noheader': '1',
             'fb': '0',
             'aged': '0',
@@ -723,6 +731,9 @@ class MJDOrder(MJDBase):
         self.sess = resp_json["sess"]
         get_prefix(resp_json)
         get_init_y(resp_json)
+        # TODO
+        # md5
+        # 动态tcd
 
         # 下载图片并转码
         download_bg_image(resp_json)
@@ -734,7 +745,7 @@ class MJDOrder(MJDBase):
         self.get_distance(bg_base64, sg_base64)
         print(f"识别到滑块距离: {self.distance}")
 
-    # 滑动验证码
+    # 滑动验证码  getWorkloadResult
     def get_cap_union_new_verify(self):
         print("滑动验证码/验证中...")
         headers = {
@@ -798,10 +809,10 @@ class MJDOrder(MJDBase):
         background, background_rgb = base64_to_image(bg)
         slider, slider_rgb = base64_to_image(sg)
 
-        def get_position_at_scale(background, slider, scale):
+        def get_position_at_scale(_background, _slider, _scale):
             # 放大图片
-            scaled_background = cv2.resize(background, None, fx=scale, fy=scale)
-            scaled_slider = cv2.resize(slider, None, fx=scale, fy=scale)
+            scaled_background = cv2.resize(_background, None, fx=_scale, fy=_scale)
+            scaled_slider = cv2.resize(_slider, None, fx=_scale, fy=_scale)
 
             # 图片预处理
             background_blur = cv2.GaussianBlur(scaled_background, (3, 3), 0)
@@ -835,7 +846,7 @@ class MJDOrder(MJDBase):
                 target_x = max_loc[0]
 
             # 将结果缩放回原始尺寸
-            return target_x / scale, max_val
+            return target_x / _scale, max_val
 
         # 使用多个缩放尺度进行匹配
         scales = [1.0, 1.5, 2.0]  # 可以调整缩放倍数
@@ -957,6 +968,7 @@ class MJDOrder(MJDBase):
         # 签名
         h5st = self.generate_h5st(js_v, func_api=func_api, input_clt_str=input_clt_str,
                                   api_query_time=api_query_time, body_str=body_str)
+        print(h5st)
 
         post_data = {
             'appid': 'tsw-m',
@@ -1023,24 +1035,24 @@ class MJDOrder(MJDBase):
 if __name__ == '__main__':
     _account = {
         # 自己的
-        # "pt_pin": "zhq91513",
-        # "pt_key": "AAJnrKaVADChKF-KgRvGcEk7VPe_YVZhcoNuzwgpeZfRLxz07Tg58KCpxB3WXCBz-T63lC4Oxqk",
+        "pt_pin": "zhq91513",
+        "pt_key": "AAJnrKaVADChKF-KgRvGcEk7VPe_YVZhcoNuzwgpeZfRLxz07Tg58KCpxB3WXCBz-T63lC4Oxqk",
         # dd
         # "pt_pin": "jd_LpHciKLtISJq",
         # "pt_key": "AAJnq3jyADDAhz0RzzMqk9LLGx3yIkDeyBCDXF1eerGEnVF8gSD7zdyT0epX6es_HhuXXk36CEg",
         # 新号
-        "pt_pin": "jd_5b204cf6a28eb",
-        "pt_key": "AAJnsyNnADC8QWPgMFGP4Vp4_H-WXKXal6QV7iYB7HSDil-kvFYr2Oq2J0zu_KLgYhss1GfNZSA",
+        # "pt_pin": "jd_5b204cf6a28eb",
+        # "pt_key": "AAJnsyNnADC8QWPgMFGP4Vp4_H-WXKXal6QV7iYB7HSDil-kvFYr2Oq2J0zu_KLgYhss1GfNZSA",
     }
     _sku_id = "10022039398507"
-    # _order_id = "307843863375"
-    # _order_id = "311046751626"  # 最新
+    _order_id = "307843863375"
+    # _order_id = "310497393363"  # 最新
     # _order_id = "309756850294"  # dd
-    _order_id = "310170016279"  # 新号
+    # _order_id = "310170016279"  # 新号
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)
     # print(mo.generate_device())
-    mo.run_create()
-    # mo.run_select()
+    # mo.run_create()
+    mo.run_select()
     # mo.get_sku_info()
     # mo.get_init_order()
     # mo.get_pay_info_m()
