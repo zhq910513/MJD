@@ -336,8 +336,8 @@ class MJDOrder(MJDBase):
         }
 
         resp = self.get_response('https://api.m.jd.com/api', params=params)
+        print(resp.status_code)
         resp_json = resp.json()
-        # print(resp_json)
 
         if resp_json["code"] != "0":
             log_error(f"获取支付信息失败：{resp_json}")
@@ -509,8 +509,8 @@ class MJDOrder(MJDBase):
         }
 
         resp = self.get_response(url=url, params=params, data=data)
+        print(resp.status_code)
         resp_json = resp.json()
-        # print(resp_json)
 
         if not resp_json.get("payInfo"):
             log_error(f"获取微信支付信息失败：{resp_json}")
@@ -743,7 +743,7 @@ if __name__ == '__main__':
     }
     _sku_id = "10022039398507"
     # _order_id = "310667443571"
-    _order_id = "310497393363"  # 最新
+    _order_id = "311437194595"  # 最新
     # _order_id = "309756850294"  # dd
     # _order_id = "310170016279"  # 新号
     mo = MJDOrder(account=_account, sku_id=_sku_id, order_id=_order_id)

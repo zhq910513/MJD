@@ -981,8 +981,8 @@ window.calculate_collect = function calculate_collect(riskData, pows) {
         # 读取图片
         bg_img = self.cv2_open(bg)
         tp_gray = self.cv2_open(tp, flag=cv2.COLOR_BGR2GRAY)[490:610, 140:260]
-        cv2.imwrite('cropped_tp2.png', tp_gray)
-        # print("图片已裁剪并保存为 cropped_tp.png")
+        cv2.imwrite('image_cropped_tp2.png', tp_gray)
+        # print("图片已裁剪并保存为 image_cropped_tp.png")
         # 金字塔均值漂移
         bg_shift = cv2.pyrMeanShiftFiltering(bg_img, 5, 50)
 
@@ -1047,11 +1047,11 @@ window.calculate_collect = function calculate_collect(riskData, pows) {
             # print(init_pos)
             response1 = self.session.get(host + img_url)
             response1 = response1.content
-            with open("bg2.png", "wb") as f:
+            with open("image_bg2.png", "wb") as f:
                 f.write(response1)
             response2 = self.session.get(host + sprite_url)
             response2 = response2.content
-            with open("tp2.png", "wb") as f:
+            with open("image_tp2.png", "wb") as f:
                 f.write(response2)
             x = self.get_distance(bg=response1, tp=response2)
             # print(x)
